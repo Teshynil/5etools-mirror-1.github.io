@@ -9,6 +9,7 @@ class PageFilterBestiary extends PageFilter {
 			case "type": return SortUtil.ascSort(a.values.type, b.values.type) || SortUtil.compareListNames(a, b);
 			case "source": return SortUtil.ascSort(a.values.source, b.values.source) || SortUtil.compareListNames(a, b);
 			case "cr": return SortUtil.ascSortCr(a.values.cr, b.values.cr) || SortUtil.compareListNames(a, b);
+			case "page": return SortUtil.ascSort(a.values.page, b.values.page) || SortUtil.compareListNames(a, b);
 		}
 	}
 
@@ -106,17 +107,17 @@ class PageFilterBestiary extends PageFilter {
 		});
 		this._conditionsInflictedFilterBase = new Filter({
 			header: "By Traits/Actions",
-			displayFn: StrUtil.toTitleCase,
+			displayFn: uid => uid.split("|")[0].toTitleCase(),
 			items: [...Parser.CONDITIONS],
 		});
 		this._conditionsInflictedFilterLegendary = new Filter({
 			header: "By Lair Actions/Regional Effects",
-			displayFn: StrUtil.toTitleCase,
+			displayFn: uid => uid.split("|")[0].toTitleCase(),
 			items: [...Parser.CONDITIONS],
 		});
 		this._conditionsInflictedFilterSpells = new Filter({
 			header: "By Spells",
-			displayFn: StrUtil.toTitleCase,
+			displayFn: uid => uid.split("|")[0].toTitleCase(),
 			items: [...Parser.CONDITIONS],
 		});
 		this._conditionsInflictedFilter = new MultiFilter({header: "Conditions Inflicted", filters: [this._conditionsInflictedFilterBase, this._conditionsInflictedFilterLegendary, this._conditionsInflictedFilterSpells]});
@@ -178,11 +179,11 @@ class PageFilterBestiary extends PageFilter {
 		});
 		this._miscFilter = new Filter({
 			header: "Miscellaneous",
-			items: ["Familiar", ...Object.keys(Parser.MON_MISC_TAG_TO_FULL), "Bonus Actions", "Lair Actions", "Legendary", "Mythic", "Adventure NPC", "Spellcaster", ...Object.values(Parser.ATB_ABV_TO_FULL).map(it => `${PageFilterBestiary.MISC_FILTER_SPELLCASTER}${it}`), "Regional Effects", "Reactions", "Swarm", "Has Variants", "Modified Copy", "Has Alternate Token", "Has Info", "Has Images", "Has Token", "Has Recharge", "SRD", "AC from Item(s)", "AC from Natural Armor", "AC from Unarmored Defense"],
+			items: ["Familiar", ...Object.keys(Parser.MON_MISC_TAG_TO_FULL), "Bonus Actions", "Lair Actions", "Legendary", "Mythic", "Adventure NPC", "Spellcaster", ...Object.values(Parser.ATB_ABV_TO_FULL).map(it => `${PageFilterBestiary.MISC_FILTER_SPELLCASTER}${it}`), "Regional Effects", "Reactions", "Reprinted", "Swarm", "Has Variants", "Modified Copy", "Has Alternate Token", "Has Info", "Has Images", "Has Token", "Has Recharge", "SRD", "Basic Rules", "AC from Item(s)", "AC from Natural Armor", "AC from Unarmored Defense"],
 			displayFn: (it) => Parser.monMiscTagToFull(it).uppercaseFirst(),
-			deselFn: (it) => it === "Adventure NPC",
+			deselFn: (it) => ["Adventure NPC", "Reprinted"].includes(it),
 			itemSortFn: PageFilterBestiary.ascSortMiscFilter,
-			isSrdFilter: true,
+			isMiscFilter: true,
 		});
 		this._spellcastingTypeFilter = new Filter({
 			header: "Spellcasting Type",
@@ -256,10 +257,12 @@ class PageFilterBestiary extends PageFilter {
 		if (mon._isCopy) mon._fMisc.push("Modified Copy");
 		if (mon.altArt) mon._fMisc.push("Has Alternate Token");
 		if (mon.srd) mon._fMisc.push("SRD");
+		if (mon.basicRules) mon._fMisc.push("Basic Rules");
 		if (mon.tokenUrl || mon.hasToken) mon._fMisc.push("Has Token");
 		if (mon.mythic) mon._fMisc.push("Mythic");
 		if (mon.hasFluff) mon._fMisc.push("Has Info");
 		if (mon.hasFluffImages) mon._fMisc.push("Has Images");
+		if (mon.reprintedAs) mon._fMisc.push("Reprinted");
 		for (const it of (mon.ac || [])) {
 			if (!it.from) continue;
 			if (it.from.includes("natural armor")) mon._fMisc.push("AC from Natural Armor");
@@ -349,6 +352,9 @@ class PageFilterBestiary extends PageFilter {
 		this._spellSlotLevelFilter.addItem(mon._fSpellSlotLevels);
 		this._spellKnownFilter.addItem(mon._fSpellsKnown);
 		if (mon._versionBase_isVersion) this._miscFilter.addItem("Is Variant");
+		this._conditionsInflictedFilterBase.addItem(mon.conditionInflict);
+		this._conditionsInflictedFilterLegendary.addItem(mon.conditionInflictLegendary);
+		this._conditionsInflictedFilterSpells.addItem(mon.conditionInflictSpell);
 	}
 
 	async _pPopulateBoxOptions (opts) {
@@ -508,17 +514,17 @@ class ModalFilterBestiary extends ModalFilter {
 		pageFilter.mutateAndAddToFilters(mon);
 
 		const eleRow = document.createElement("div");
-		eleRow.className = "px-0 w-100 flex-col no-shrink";
+		eleRow.className = "px-0 w-100 ve-flex-col no-shrink";
 
 		const hash = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_BESTIARY](mon);
 		const source = Parser.sourceJsonToAbv(mon.source);
 		const type = mon._pTypes.asText.uppercaseFirst();
 		const cr = mon._pCr;
 
-		eleRow.innerHTML = `<div class="w-100 flex-vh-center lst--border no-select lst__wrp-cells">
-			<div class="col-0-5 pl-0 flex-vh-center">${this._isRadio ? `<input type="radio" name="radio" class="no-events">` : `<input type="checkbox" class="no-events">`}</div>
+		eleRow.innerHTML = `<div class="w-100 ve-flex-vh-center lst--border no-select lst__wrp-cells">
+			<div class="col-0-5 pl-0 ve-flex-vh-center">${this._isRadio ? `<input type="radio" name="radio" class="no-events">` : `<input type="checkbox" class="no-events">`}</div>
 
-			<div class="col-0-5 px-1 flex-vh-center">
+			<div class="col-0-5 px-1 ve-flex-vh-center">
 				<div class="ui-list__btn-inline px-2" title="Toggle Preview (SHIFT to Toggle Info Preview)">[+]</div>
 			</div>
 

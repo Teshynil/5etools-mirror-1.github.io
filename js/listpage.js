@@ -63,6 +63,8 @@ class ListPage {
 		this._ixData = 0;
 		this._bookView = null;
 		this._$pgContent = null;
+
+		this._seenHashes = new Set();
 	}
 
 	_bookView_popTblGetNumShown ({$wrpContent, $dispName, $wrpControls}, {fnPartition} = {}) {
@@ -168,6 +170,8 @@ class ListPage {
 		const homebrew = await (this._brewDataSource ? this._brewDataSource() : BrewUtil.pAddBrewData());
 		await this._pHandleBrew(homebrew);
 
+		this._pageFilter.trimState();
+
 		BrewUtil.makeBrewButton("manage-brew");
 		await ListUtil.pLoadState();
 		RollerUtil.addListRollButton();
@@ -190,6 +194,9 @@ class ListPage {
 		Hist.init(true);
 
 		ListPage._checkShowAllExcluded(this._dataList, this._$pgContent);
+
+		this.handleFilterChange();
+
 		window.dispatchEvent(new Event("toolsLoaded"));
 	}
 
@@ -241,7 +248,6 @@ class ListPage {
 
 		this._dataProps.forEach(prop => {
 			if (!data[prop]) return;
-			data[prop].forEach(it => it.__prop = prop);
 			this._dataList.push(...data[prop]);
 		});
 
@@ -257,7 +263,7 @@ class ListPage {
 
 		this._list.update();
 		this._filterBox.render();
-		this.handleFilterChange();
+		if (!Hist.initialLoad) this.handleFilterChange();
 
 		ListUtil.setOptions({
 			itemList: this._dataList,

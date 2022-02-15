@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "items.json",
-	"version": "1.11.0",
+	"version": "1.11.3",
 	"type": "object",
 	"definitions": {
 		"itemData": {
@@ -363,6 +363,9 @@
 				"srd": {
 					"$ref": "util.json#/definitions/srd"
 				},
+				"basicRules": {
+					"$ref": "util.json#/definitions/basicRules"
+				},
 				"packContents": {
 					"type": "array",
 					"items": {
@@ -445,6 +448,13 @@
 				"spellScrollLevel": {
 					"type": "integer"
 				},
+				"seeAlsoVehicle": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"description": "UIDs of \"vehicle\"s to be linked in a \"See Also\" footnote.\nEx.: \"rowboat|gos\"."
+					}
+				},
 				"reqAttuneTags": {
 					"$ref": "util.json#/definitions/reqAttuneTags"
 				},
@@ -458,7 +468,8 @@
 					"type": "boolean"
 				},
 				"hasRefs": {
-					"type": "boolean"
+					"type": "boolean",
+					"description": "Whether this item has references within its data to dedicated \"itemEntry\"s."
 				},
 				"_copy": {
 					"type": "object",
@@ -882,6 +893,9 @@
 						"srd": {
 							"$ref": "util.json#/definitions/srd"
 						},
+						"basicRules": {
+							"$ref": "util.json#/definitions/basicRules"
+						},
 						"packContents": {
 							"type": "array",
 							"items": {
@@ -964,6 +978,13 @@
 						"spellScrollLevel": {
 							"type": "integer"
 						},
+						"seeAlsoVehicle": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"description": "UIDs of \"vehicle\"s to be linked in a \"See Also\" footnote.\nEx.: \"rowboat|gos\"."
+							}
+						},
 						"reqAttuneTags": {
 							"$ref": "util.json#/definitions/reqAttuneTags"
 						},
@@ -977,7 +998,8 @@
 							"type": "boolean"
 						},
 						"hasRefs": {
-							"type": "boolean"
+							"type": "boolean",
+							"description": "Whether this item has references within its data to dedicated \"itemEntry\"s."
 						},
 						"_copy": {
 							"type": "object",
@@ -1404,6 +1426,9 @@
 						"srd": {
 							"$ref": "util.json#/definitions/srd"
 						},
+						"basicRules": {
+							"$ref": "util.json#/definitions/basicRules"
+						},
 						"packContents": {
 							"type": "array",
 							"items": {
@@ -1486,6 +1511,13 @@
 						"spellScrollLevel": {
 							"type": "integer"
 						},
+						"seeAlsoVehicle": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"description": "UIDs of \"vehicle\"s to be linked in a \"See Also\" footnote.\nEx.: \"rowboat|gos\"."
+							}
+						},
 						"reqAttuneTags": {
 							"$ref": "util.json#/definitions/reqAttuneTags"
 						},
@@ -1499,7 +1531,8 @@
 							"type": "boolean"
 						},
 						"hasRefs": {
-							"type": "boolean"
+							"type": "boolean",
+							"description": "Whether this item has references within its data to dedicated \"itemEntry\"s."
 						},
 						"_copy": {
 							"type": "object",
@@ -1573,14 +1606,29 @@
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/item"
-			}
+			},
+			"uniqueItems": true
 		},
 		"itemGroup": {
 			"description": "Used to create fake item entries for groups of related items, often referred to as a single item (e.g. arcane foci)",
 			"type": "array",
 			"items": {
-				"$ref": "#/definitions/item"
-			}
+				"type": "object",
+				"$ref": "#/definitions/item",
+				"oneOf": [
+					{
+						"required": [
+							"items"
+						]
+					},
+					{
+						"required": [
+							"_copy"
+						]
+					}
+				]
+			},
+			"uniqueItems": true
 		},
 		"_meta": {
 			"$ref": "util.json#/definitions/metaBlock"

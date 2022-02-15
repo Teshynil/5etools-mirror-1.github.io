@@ -21,7 +21,7 @@ class VehiclesPage extends ListPage {
 		this._pageFilter.mutateAndAddToFilters(it, isExcluded);
 
 		const eleLi = document.createElement("div");
-		eleLi.className = `lst__row flex-col ${isExcluded ? "lst__row--blacklisted" : ""}`;
+		eleLi.className = `lst__row ve-flex-col ${isExcluded ? "lst__row--blacklisted" : ""}`;
 
 		const source = Parser.sourceJsonToAbv(it.source);
 		const hash = UrlUtil.autoEncodeHash(it);
@@ -63,7 +63,7 @@ class VehiclesPage extends ListPage {
 	pGetSublistItem (it, ix) {
 		const hash = UrlUtil.autoEncodeHash(it);
 
-		const $ele = $(`<div class="lst__row lst__row--sublist flex-col"><a href="#${hash}" class="lst--border lst__row-inner">
+		const $ele = $(`<div class="lst__row lst__row--sublist ve-flex-col"><a href="#${hash}" class="lst--border lst__row-inner">
 			<span class="col-8 pl-0 text-center">${it.vehicleType ? Parser.vehicleTypeToFull(it.vehicleType) : it.upgradeType.map(t => Parser.vehicleTypeToFull(t))}</span>
 			<span class="bold col-4 pr-0">${it.name}</span>
 		</a></div>`)
@@ -87,14 +87,14 @@ class VehiclesPage extends ListPage {
 		Renderer.get().setFirstSection(true);
 		const veh = this._dataList[id];
 		this._$pgContent.empty();
-		const $floatToken = $(`#float-token`).empty();
+		(this._$dispToken = this._$dispToken || $(`#float-token`)).empty();
 
 		const buildStatsTab = () => {
 			if (veh.vehicleType) {
 				const hasToken = veh.tokenUrl || veh.hasToken;
 				if (hasToken) {
 					const imgLink = Renderer.vehicle.getTokenUrl(veh);
-					$floatToken.append(`<a href="${imgLink}" target="_blank" rel="noopener noreferrer"><img src="${imgLink}" id="token_image" class="token" alt="Token Image: ${(veh.name || "").qq()}"></a>`);
+					this._$dispToken.append(`<a href="${imgLink}" target="_blank" rel="noopener noreferrer"><img src="${imgLink}" id="token_image" class="token" alt="Token Image: ${(veh.name || "").qq()}"></a>`);
 				}
 
 				this._$pgContent.append(RenderVehicles.$getRenderedVehicle(veh));
@@ -115,19 +115,19 @@ class VehiclesPage extends ListPage {
 		const tabMetas = [
 			new Renderer.utils.TabButton({
 				label: "Item",
-				fnChange: () => $floatToken.show(),
+				fnChange: () => this._$dispToken.show(),
 				fnPopulate: buildStatsTab,
 				isVisible: true,
 			}),
 			new Renderer.utils.TabButton({
 				label: "Info",
-				fnChange: () => $floatToken.hide(),
+				fnChange: () => this._$dispToken.hide(),
 				fnPopulate: buildFluffTab,
 				isVisible: Renderer.utils.hasFluffText(veh, "vehicleFluff"),
 			}),
 			new Renderer.utils.TabButton({
 				label: "Images",
-				fnChange: () => $floatToken.hide(),
+				fnChange: () => this._$dispToken.hide(),
 				fnPopulate: buildFluffTab.bind(null, true),
 				isVisible: Renderer.utils.hasFluffImages(veh, "vehicleFluff"),
 			}),

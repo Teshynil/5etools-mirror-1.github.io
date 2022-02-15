@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "trapshazards.json",
-	"version": "1.2.0",
+	"version": "1.2.2",
 	"type": "object",
 
 	"definitions": {
@@ -34,7 +34,12 @@
 								"$ref": "entry.json"
 							}
 						},
-						"srd": {"$ref": "util.json#/definitions/srd"}
+						"srd": {"$ref": "util.json#/definitions/srd"},
+						"$$ifBrew": {
+							"foundryImg": {
+								"$ref": "util.json#/definitions/foundryImg"
+							}
+						}
 					},
 					"additionalProperties": false,
 					"required": [
@@ -141,7 +146,12 @@
 								"$ref": "entry.json"
 							}
 						},
-						"srd": {"$ref": "util.json#/definitions/srd"}
+						"srd": {"$ref": "util.json#/definitions/srd"},
+						"$$ifBrew": {
+							"foundryImg": {
+								"$ref": "util.json#/definitions/foundryImg"
+							}
+						}
 					},
 					"additionalProperties": false,
 					"required": [
@@ -166,14 +176,17 @@
 				"trapHazType": {
 					"type": "string",
 					"description": "ENV: Environmental Hazard\n EST: Eldritch Storm\n GEN: Generic\n WTH: Weather\n WLD: Wilderness Hazard",
-
-					"enum": [
-						"WTH",
-						"ENV",
-						"WLD",
-						"GEN",
-						"EST"
-					]
+					"$$ifSiteElse_key": {
+						"keySite": "enum",
+						"keyBrew": "examples",
+						"value": [
+							"ENV",
+							"EST",
+							"GEN",
+							"WTH",
+							"WLD"
+						]
+					}
 				},
 				"source": {
 					"type": "string"
@@ -181,13 +194,21 @@
 				"page": {
 					"type": "integer"
 				},
+				"otherSources": {
+					"$ref": "util.json#/definitions/otherSources"
+				},
 				"entries": {
 					"type": "array",
 					"items": {
 						"$ref": "entry.json"
 					}
 				},
-				"srd": {"$ref": "util.json#/definitions/srd"}
+				"srd": {"$ref": "util.json#/definitions/srd"},
+				"$$ifBrew": {
+					"foundryImg": {
+						"$ref": "util.json#/definitions/foundryImg"
+					}
+				}
 			},
 			"additionalProperties": false,
 			"required": [

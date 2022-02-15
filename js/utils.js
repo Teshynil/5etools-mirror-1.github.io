@@ -7,7 +7,7 @@ if (IS_NODE) require("./parser.js");
 
 // in deployment, `IS_DEPLOYED = "<version number>";` should be set below.
 IS_DEPLOYED = undefined;
-VERSION_NUMBER = /* 5ETOOLS_VERSION__OPEN */"1.143.0"/* 5ETOOLS_VERSION__CLOSE */;
+VERSION_NUMBER = /* 5ETOOLS_VERSION__OPEN */"1.149.1"/* 5ETOOLS_VERSION__CLOSE */;
 DEPLOYED_STATIC_ROOT = ""; // "https://static.5etools.com/"; // FIXME re-enable this when we have a CDN again
 // for the roll20 script to set
 IS_VTT = false;
@@ -50,6 +50,10 @@ VeCt = {
 	STR_GENERIC: "Generic",
 
 	SYM_UI_SKIP: Symbol("uiSkip"),
+
+	SYM_WALKER_BREAK: Symbol("walkerBreak"),
+
+	SYM_UTIL_TIMEOUT: Symbol("timeout"),
 
 	LOC_ORIGIN_CANCER: "https://5e.tools",
 
@@ -277,7 +281,7 @@ StrUtil = {
 	// Certain minor words should be left lowercase unless they are the first or last words in the string
 	TITLE_LOWER_WORDS: ["a", "an", "the", "and", "but", "or", "for", "nor", "as", "at", "by", "for", "from", "in", "into", "near", "of", "on", "onto", "to", "with", "over"],
 	// Certain words such as initialisms or acronyms should be left uppercase
-	TITLE_UPPER_WORDS: ["Id", "Tv", "Dm", "Ok", "Npc", "Pc"],
+	TITLE_UPPER_WORDS: ["Id", "Tv", "Dm", "Ok", "Npc", "Pc", "Tpk"],
 
 	padNumber: (n, len, padder) => {
 		return String(n).padStart(len, padder);
@@ -350,7 +354,7 @@ CleanUtil.STR_REPLACEMENTS = {
 };
 CleanUtil.SHARED_REPLACEMENTS_REGEX = new RegExp(Object.keys(CleanUtil.SHARED_REPLACEMENTS).join("|"), "g");
 CleanUtil.STR_REPLACEMENTS_REGEX = new RegExp(Object.keys(CleanUtil.STR_REPLACEMENTS).join("|"), "g");
-CleanUtil._SOFT_HYPHEN_REMOVE_REGEX = /\u00AD/g;
+CleanUtil._SOFT_HYPHEN_REMOVE_REGEX = /\u00AD *\r?\n?\r?/g;
 CleanUtil._ELLIPSIS_COLLAPSE_REGEX = /\s*(\.\s*\.\s*\.)/g;
 CleanUtil._DASH_COLLAPSE_REGEX = /[ ]*([\u2014\u2013])[ ]*/g;
 CleanUtil._TAG_DASH_EXPAND_REGEX = /({@[a-zA-Z])([\u2014\u2013])/g;
@@ -381,10 +385,10 @@ SourceUtil = {
 	},
 
 	isNonstandardSource (source) {
-		return source != null && !BrewUtil.hasSourceJson(source) && SourceUtil._isNonstandardSourceWiz(source);
+		return source != null && !BrewUtil.hasSourceJson(source) && SourceUtil.isNonstandardSourceWotc(source);
 	},
 
-	_isNonstandardSourceWiz (source) {
+	isNonstandardSourceWotc (source) {
 		return source.startsWith(SRC_UA_PREFIX) || source.startsWith(SRC_PS_PREFIX) || source.startsWith(SRC_AL_PREFIX) || Parser.SOURCES_NON_STANDARD_WOTC.has(source);
 	},
 
@@ -975,7 +979,8 @@ MiscUtil = {
 	COLOR_BLOODIED: "#f7a100",
 	COLOR_DEFEATED: "#cc0000",
 
-	copy (obj) {
+	copy (obj, safe = false) {
+		if (safe && obj === undefined) return undefined; // Generally use "unsafe," as this helps identify bugs.
 		return JSON.parse(JSON.stringify(obj));
 	},
 
@@ -1347,7 +1352,7 @@ MiscUtil = {
 		return new Promise(resolve => setTimeout(() => resolve(resolveAs), msecs));
 	},
 
-	GENERIC_WALKER_ENTRIES_KEY_BLACKLIST: new Set(["caption", "type", "colLabels", "name", "colStyles", "style", "shortName", "subclassShortName"]),
+	GENERIC_WALKER_ENTRIES_KEY_BLACKLIST: new Set(["caption", "type", "colLabels", "name", "colStyles", "style", "shortName", "subclassShortName", "id", "path"]),
 
 	/**
 	 * @param [opts]
@@ -1359,72 +1364,63 @@ MiscUtil = {
 	 * @param [opts.isAllowDeleteStrings] (Unimplemented) // TODO
 	 * @param [opts.isDepthFirst] If array/object recursion should occur before array/object primitive handling.
 	 * @param [opts.isNoModification] If the walker should not attempt to modify the data.
+	 * @param [opts.isBreakOnReturn] If the walker should fast-exist on any handler returning a value.
 	 */
 	getWalker (opts) {
 		opts = opts || {};
+
+		if (opts.isBreakOnReturn && !opts.isNoModification) throw new Error(`"isBreakOnReturn" may only be used in "isNoModification" mode!`);
+
 		const keyBlacklist = opts.keyBlacklist || new Set();
 
-		const fn = (obj, primitiveHandlers, lastKey, stack) => {
-			if (obj == null) {
-				if (primitiveHandlers.null) return MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.null, obj, lastKey, stack});
-				return obj;
+		const getMappedPrimitive = (obj, primitiveHandlers, lastKey, stack, prop, propPre, propPost) => {
+			if (primitiveHandlers[propPre]) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers[propPre], obj, lastKey, stack});
+			if (primitiveHandlers[prop]) {
+				const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers[prop], obj, lastKey, stack});
+				if (out === VeCt.SYM_WALKER_BREAK) return out;
+				if (!opts.isNoModification) obj = out;
 			}
+			if (primitiveHandlers[propPost]) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers[propPost], obj, lastKey, stack});
+			return obj;
+		};
 
-			const doObjectRecurse = () => {
-				Object.keys(obj).forEach(k => {
-					const v = obj[k];
-					if (!keyBlacklist.has(k)) {
-						const out = fn(v, primitiveHandlers, k, stack);
-						if (!opts.isNoModification) obj[k] = out;
-					}
-				});
-			};
+		const doObjectRecurse = (obj, primitiveHandlers, stack) => {
+			const didBreak = Object.keys(obj).some(k => {
+				const v = obj[k];
+				if (keyBlacklist.has(k)) return;
+
+				const out = fn(v, primitiveHandlers, k, stack);
+				if (out === VeCt.SYM_WALKER_BREAK) return true;
+				if (!opts.isNoModification) obj[k] = out;
+			});
+			if (didBreak) return VeCt.SYM_WALKER_BREAK;
+		};
+
+		const fn = (obj, primitiveHandlers, lastKey, stack) => {
+			if (obj === null) return getMappedPrimitive(obj, primitiveHandlers, lastKey, stack, "null", "preNull", "postNull");
 
 			const to = typeof obj;
 			switch (to) {
-				case undefined:
-					if (primitiveHandlers.preUndefined) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.preUndefined, obj, lastKey, stack});
-					if (primitiveHandlers.undefined) {
-						const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.undefined, obj, lastKey, stack});
-						if (!opts.isNoModification) obj = out;
-					}
-					if (primitiveHandlers.postUndefined) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.postUndefined, obj, lastKey, stack});
-					return obj;
-				case "boolean":
-					if (primitiveHandlers.preBoolean) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.preBoolean, obj, lastKey, stack});
-					if (primitiveHandlers.boolean) {
-						const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.boolean, obj, lastKey, stack});
-						if (!opts.isNoModification) obj = out;
-					}
-					if (primitiveHandlers.postBoolean) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.postBoolean, obj, lastKey, stack});
-					return obj;
-				case "number":
-					if (primitiveHandlers.preNumber) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.preNumber, obj, lastKey, stack});
-					if (primitiveHandlers.number) {
-						const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.number, obj, lastKey, stack});
-						if (!opts.isNoModification) obj = out;
-					}
-					if (primitiveHandlers.postNumber) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.postNumber, obj, lastKey, stack});
-					return obj;
-				case "string":
-					if (primitiveHandlers.preString) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.preString, obj, lastKey, stack});
-					if (primitiveHandlers.string) {
-						const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.string, obj, lastKey, stack});
-						if (!opts.isNoModification) obj = out;
-					}
-					if (primitiveHandlers.postString) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.postString, obj, lastKey, stack});
-					return obj;
+				case "undefined": return getMappedPrimitive(obj, primitiveHandlers, lastKey, stack, "undefined", "preUndefined", "postUndefined");
+				case "boolean": return getMappedPrimitive(obj, primitiveHandlers, lastKey, stack, "boolean", "preBoolean", "postBoolean");
+				case "number": return getMappedPrimitive(obj, primitiveHandlers, lastKey, stack, "number", "preNumber", "postNumber");
+				case "string": return getMappedPrimitive(obj, primitiveHandlers, lastKey, stack, "string", "preString", "postString");
 				case "object": {
 					if (obj instanceof Array) {
 						if (primitiveHandlers.preArray) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.preArray, obj, lastKey, stack});
 						if (opts.isDepthFirst) {
 							if (stack) stack.push(obj);
-							const out = obj.map(it => fn(it, primitiveHandlers, lastKey, stack));
+							const out = new Array(obj.length);
+							for (let i = 0, len = out.length; i < len; ++i) {
+								out[i] = fn(obj[i], primitiveHandlers, lastKey, stack);
+								if (out[i] === VeCt.SYM_WALKER_BREAK) return out[i];
+							}
 							if (!opts.isNoModification) obj = out;
 							if (stack) stack.pop();
 
 							if (primitiveHandlers.array) {
 								const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.array, obj, lastKey, stack});
+								if (out === VeCt.SYM_WALKER_BREAK) return out;
 								if (!opts.isNoModification) obj = out;
 							}
 							if (obj == null) {
@@ -1433,10 +1429,15 @@ MiscUtil = {
 						} else {
 							if (primitiveHandlers.array) {
 								const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.array, obj, lastKey, stack});
+								if (out === VeCt.SYM_WALKER_BREAK) return out;
 								if (!opts.isNoModification) obj = out;
 							}
 							if (obj != null) {
-								const out = obj.map(it => fn(it, primitiveHandlers, lastKey, stack));
+								const out = new Array(obj.length);
+								for (let i = 0, len = out.length; i < len; ++i) {
+									out[i] = fn(obj[i], primitiveHandlers, lastKey, stack);
+									if (out[i] === VeCt.SYM_WALKER_BREAK) return out[i];
+								}
 								if (!opts.isNoModification) obj = out;
 							} else {
 								if (!opts.isAllowDeleteArrays) throw new Error(`Array handler(s) returned null!`);
@@ -1448,11 +1449,13 @@ MiscUtil = {
 						if (primitiveHandlers.preObject) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.preObject, obj, lastKey, stack});
 						if (opts.isDepthFirst) {
 							if (stack) stack.push(obj);
-							doObjectRecurse();
+							const flag = doObjectRecurse(obj, primitiveHandlers, stack);
+							if (flag === VeCt.SYM_WALKER_BREAK) return flag;
 							if (stack) stack.pop();
 
 							if (primitiveHandlers.object) {
 								const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.object, obj, lastKey, stack});
+								if (out === VeCt.SYM_WALKER_BREAK) return out;
 								if (!opts.isNoModification) obj = out;
 							}
 							if (obj == null) {
@@ -1461,12 +1464,14 @@ MiscUtil = {
 						} else {
 							if (primitiveHandlers.object) {
 								const out = MiscUtil._getWalker_applyHandlers({opts, handlers: primitiveHandlers.object, obj, lastKey, stack});
+								if (out === VeCt.SYM_WALKER_BREAK) return out;
 								if (!opts.isNoModification) obj = out;
 							}
 							if (obj == null) {
 								if (!opts.isAllowDeleteObjects) throw new Error(`Object handler(s) returned null!`);
 							} else {
-								doObjectRecurse();
+								const flag = doObjectRecurse(obj, primitiveHandlers, stack);
+								if (flag === VeCt.SYM_WALKER_BREAK) return flag;
 							}
 						}
 						if (primitiveHandlers.postObject) MiscUtil._getWalker_runHandlers({handlers: primitiveHandlers.postObject, obj, lastKey, stack});
@@ -1482,10 +1487,12 @@ MiscUtil = {
 
 	_getWalker_applyHandlers ({opts, handlers, obj, lastKey, stack}) {
 		handlers = handlers instanceof Array ? handlers : [handlers];
-		handlers.forEach(h => {
+		const didBreak = handlers.some(h => {
 			const out = h(obj, lastKey, stack);
+			if (opts.isBreakOnReturn && out) return true;
 			if (!opts.isNoModification) obj = out;
 		});
+		if (didBreak) return VeCt.SYM_WALKER_BREAK;
 		return obj;
 	},
 
@@ -1495,6 +1502,7 @@ MiscUtil = {
 	},
 
 	/**
+	 * TODO refresh to match sync version
 	 * @param [opts]
 	 * @param [opts.keyBlacklist]
 	 * @param [opts.isAllowDeleteObjects] If returning `undefined` from an object handler should be treated as a delete.
@@ -1774,7 +1782,7 @@ ContextUtil = {
 				return $row;
 			});
 
-			this._$ele = $$`<div class="flex-col ui-ctx__wrp py-2">${$elesAction}</div>`
+			this._$ele = $$`<div class="ve-flex-col ui-ctx__wrp py-2">${$elesAction}</div>`
 				.hideVe()
 				.appendTo(document.body);
 		};
@@ -1954,7 +1962,7 @@ UrlUtil = {
 			(cls.classFeatures || []).forEach((lvlFeatureList, ixLvl) => {
 				lvlFeatureList
 					// don't add "you gain a subclass feature" or ASI's
-					.filter(feature => !feature.gainSubclassFeature
+					.filter(feature => (!feature.gainSubclassFeature || feature.gainSubclassFeatureHasContent)
 						&& feature.name !== "Ability Score Improvement"
 						&& feature.name !== "Proficiency Versatility")
 					.forEach((feature, ixFeature) => {
@@ -2083,6 +2091,7 @@ UrlUtil.PG_CHANGELOG = "changelog.html";
 UrlUtil.PG_CHAR_CREATION_OPTIONS = "charcreationoptions.html";
 UrlUtil.PG_RECIPES = "recipes.html";
 UrlUtil.PG_CLASS_SUBCLASS_FEATURES = "classfeatures.html";
+UrlUtil.PG_MAPS = "maps.html";
 
 UrlUtil.URL_TO_HASH_BUILDER = {};
 UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_BESTIARY] = (it) => UrlUtil.encodeForHash([it.name, it.source]);
@@ -2112,7 +2121,42 @@ UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_LANGUAGES] = (it) => UrlUtil.encodeForHas
 UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CHAR_CREATION_OPTIONS] = (it) => UrlUtil.encodeForHash([it.name, it.source]);
 UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_RECIPES] = (it) => `${UrlUtil.encodeForHash([it.name, it.source])}${it._scaleFactor ? `${HASH_PART_SEP}${VeCt.HASH_SCALED}${HASH_SUB_KV_SEP}${it._scaleFactor}` : ""}`;
 UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CLASS_SUBCLASS_FEATURES] = (it) => (it.__prop === "subclassFeature" || it.subclassSource) ? UrlUtil.URL_TO_HASH_BUILDER["subclassFeature"](it) : UrlUtil.URL_TO_HASH_BUILDER["classFeature"](it);
+
 // region Fake pages (props)
+UrlUtil.URL_TO_HASH_BUILDER["monster"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_BESTIARY];
+UrlUtil.URL_TO_HASH_BUILDER["spell"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_SPELLS];
+UrlUtil.URL_TO_HASH_BUILDER["background"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_BACKGROUNDS];
+UrlUtil.URL_TO_HASH_BUILDER["item"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_ITEMS];
+UrlUtil.URL_TO_HASH_BUILDER["itemGroup"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_ITEMS];
+UrlUtil.URL_TO_HASH_BUILDER["baseitem"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_ITEMS];
+UrlUtil.URL_TO_HASH_BUILDER["variant"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_ITEMS];
+UrlUtil.URL_TO_HASH_BUILDER["class"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CLASSES];
+UrlUtil.URL_TO_HASH_BUILDER["condition"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CONDITIONS_DISEASES];
+UrlUtil.URL_TO_HASH_BUILDER["disease"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CONDITIONS_DISEASES];
+UrlUtil.URL_TO_HASH_BUILDER["status"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CONDITIONS_DISEASES];
+UrlUtil.URL_TO_HASH_BUILDER["feat"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_FEATS];
+UrlUtil.URL_TO_HASH_BUILDER["optionalfeature"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_OPT_FEATURES];
+UrlUtil.URL_TO_HASH_BUILDER["psionic"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_PSIONICS];
+UrlUtil.URL_TO_HASH_BUILDER["race"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_RACES];
+UrlUtil.URL_TO_HASH_BUILDER["reward"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_REWARDS];
+UrlUtil.URL_TO_HASH_BUILDER["variantrule"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_VARIANTRULES];
+UrlUtil.URL_TO_HASH_BUILDER["adventure"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_ADVENTURES];
+UrlUtil.URL_TO_HASH_BUILDER["book"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_BOOKS];
+UrlUtil.URL_TO_HASH_BUILDER["deity"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_DEITIES];
+UrlUtil.URL_TO_HASH_BUILDER["cult"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CULTS_BOONS];
+UrlUtil.URL_TO_HASH_BUILDER["boon"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CULTS_BOONS];
+UrlUtil.URL_TO_HASH_BUILDER["object"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_OBJECTS];
+UrlUtil.URL_TO_HASH_BUILDER["trap"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_TRAPS_HAZARDS];
+UrlUtil.URL_TO_HASH_BUILDER["hazard"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_TRAPS_HAZARDS];
+UrlUtil.URL_TO_HASH_BUILDER["table"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_TABLES];
+UrlUtil.URL_TO_HASH_BUILDER["tableGroup"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_TABLES];
+UrlUtil.URL_TO_HASH_BUILDER["vehicle"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_VEHICLES];
+UrlUtil.URL_TO_HASH_BUILDER["vehicleUpgrade"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_VEHICLES];
+UrlUtil.URL_TO_HASH_BUILDER["action"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_ACTIONS];
+UrlUtil.URL_TO_HASH_BUILDER["language"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_LANGUAGES];
+UrlUtil.URL_TO_HASH_BUILDER["charoption"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CHAR_CREATION_OPTIONS];
+UrlUtil.URL_TO_HASH_BUILDER["recipe"] = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_RECIPES];
+
 UrlUtil.URL_TO_HASH_BUILDER["subclass"] = it => {
 	const hashParts = [
 		UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CLASSES]({name: it.className, source: it.classSource}),
@@ -2168,6 +2212,7 @@ UrlUtil.PG_TO_NAME[UrlUtil.PG_CHANGELOG] = "Changelog";
 UrlUtil.PG_TO_NAME[UrlUtil.PG_CHAR_CREATION_OPTIONS] = "Other Character Creation Options";
 UrlUtil.PG_TO_NAME[UrlUtil.PG_RECIPES] = "Recipes";
 UrlUtil.PG_TO_NAME[UrlUtil.PG_CLASS_SUBCLASS_FEATURES] = "Class & Subclass Features";
+UrlUtil.PG_TO_NAME[UrlUtil.PG_MAPS] = "Maps";
 
 UrlUtil.CAT_TO_PAGE = {};
 UrlUtil.CAT_TO_PAGE[Parser.CAT_ID_CREATURE] = UrlUtil.PG_BESTIARY;
@@ -2331,8 +2376,8 @@ SortUtil = {
 		if (a.sort == null && b.sort != null) return 1;
 
 		if (!a.name && !b.name) return 0;
-		const aClean = a.name.toLowerCase().trim();
-		const bClean = b.name.toLowerCase().trim();
+		const aClean = Renderer.stripTags(a.name).toLowerCase().trim();
+		const bClean = Renderer.stripTags(b.name).toLowerCase().trim();
 
 		const isOnlyA = a.name.endsWith(" Only)");
 		const isOnlyB = b.name.endsWith(" Only)");
@@ -2377,51 +2422,73 @@ SortUtil = {
 		return aSpecial && bSpecial ? 0 : aSpecial ? 1 : bSpecial ? -1 : Parser.ABIL_ABVS.indexOf(a) - Parser.ABIL_ABVS.indexOf(b);
 	},
 
+	ascSortSize (a, b) { return Parser.SIZE_ABVS.indexOf(a) - Parser.SIZE_ABVS.indexOf(b); },
+
 	initBtnSortHandlers ($wrpBtnsSort, list) {
-		let $dispCaretInitial = null;
-		const $dispCarets = [];
+		let dispCaretInitial = null;
 
-		$wrpBtnsSort.find(".sort").each((i, e) => {
-			const $btnSort = $(e);
-			const $dispCaret = SortUtil._initBtnSortHandlers_getAddCaret($btnSort);
+		const dispCarets = [...$wrpBtnsSort[0].querySelectorAll(".sort")]
+			.map(btnSort => {
+				const dispCaret = e_({
+					tag: "span",
+					clazz: "lst__caret",
+				})
+					.appendTo(btnSort);
 
-			$dispCarets.push($dispCaret);
+				const btnSortField = btnSort.dataset.sort;
 
-			if ($btnSort.data("sort") === list.sortBy) $dispCaretInitial = $dispCaret;
+				if (btnSortField === list.sortBy) dispCaretInitial = dispCaret;
 
-			$btnSort.click(evt => {
-				evt.stopPropagation();
-				const direction = list.sortDir === "asc" ? "desc" : "asc";
-				SortUtil._initBtnSortHandlers_showCaret({$dispCarets, $dispCaret, direction});
-				list.sort($btnSort.data("sort"), direction);
+				e_({
+					ele: btnSort,
+					click: evt => {
+						evt.stopPropagation();
+						const direction = list.sortDir === "asc" ? "desc" : "asc";
+						SortUtil._initBtnSortHandlers_showCaret({dispCarets, dispCaret, direction});
+						list.sort(btnSortField, direction);
+					},
+				});
+
+				return dispCaret;
 			});
-		});
 
-		$dispCaretInitial = $dispCaretInitial || $dispCarets[0]; // Fall back on displaying the first caret
+		dispCaretInitial = dispCaretInitial || dispCarets[0]; // Fall back on displaying the first caret
 
-		SortUtil._initBtnSortHandlers_showCaret({$dispCaret: $dispCaretInitial, $dispCarets, direction: list.sortDir});
-	},
-
-	_initBtnSortHandlers_getAddCaret ($btnSort) {
-		const $existing = $btnSort.find(`.lst__caret`);
-		if ($existing.length) return $existing;
-		return $(`<span class="lst__caret"></span>`).appendTo($btnSort);
+		SortUtil._initBtnSortHandlers_showCaret({dispCaret: dispCaretInitial, dispCarets, direction: list.sortDir});
 	},
 
 	_initBtnSortHandlers_showCaret (
 		{
-			$dispCaret,
-			$dispCarets,
+			dispCaret,
+			dispCarets,
 			direction,
 		},
 	) {
-		$dispCarets.forEach($it => $it.removeClass("lst__caret--active"));
-		$dispCaret.addClass("lst__caret--active").toggleClass("lst__caret--reverse", direction === "asc");
+		dispCarets.forEach($it => $it.removeClass("lst__caret--active"));
+		dispCaret.addClass("lst__caret--active").toggleClass("lst__caret--reverse", direction === "asc");
+	},
+
+	/** Add more list sort on-clicks to existing sort buttons. */
+	initBtnSortHandlersAdditional ($wrpBtnsSort, list) {
+		[...$wrpBtnsSort[0].querySelectorAll(".sort")]
+			.map(btnSort => {
+				const btnSortField = btnSort.dataset.sort;
+
+				e_({
+					ele: btnSort,
+					click: evt => {
+						evt.stopPropagation();
+						const direction = list.sortDir === "asc" ? "desc" : "asc";
+						list.sort(btnSortField, direction);
+					},
+				});
+			});
 	},
 
 	ascSortAdventure (a, b) {
 		return SortUtil.ascSortDateString(b.published, a.published)
 			|| SortUtil.ascSortLower(a.parentSource || "", b.parentSource || "")
+			|| SortUtil.ascSort(a.publishedOrder ?? 0, b.publishedOrder ?? 0)
 			|| SortUtil.ascSortLower(a.storyline, b.storyline)
 			|| SortUtil.ascSort(a.level?.start ?? 20, b.level?.start ?? 20)
 			|| SortUtil.ascSortLower(a.name, b.name);
@@ -2474,6 +2541,18 @@ DataUtil = {
 		return DataUtil._loaded[url];
 	},
 
+	_mutAddProps (data) {
+		if (data && typeof data === "object") {
+			for (const k in data) {
+				if (data[k] instanceof Array) {
+					for (let i = 0, len = data[k].length; i < len; ++i) {
+						data[k][i].__prop = k;
+					}
+				}
+			}
+		}
+	},
+
 	async loadJSON (url, ...otherData) {
 		const procUrl = UrlUtil.link(url);
 
@@ -2497,6 +2576,7 @@ DataUtil = {
 	},
 
 	async pDoMetaMerge (ident, data, options) {
+		DataUtil._mutAddProps(data);
 		DataUtil._merging[ident] = DataUtil._merging[ident] || DataUtil._pDoMetaMerge(ident, data, options);
 		await DataUtil._merging[ident];
 		return DataUtil._merged[ident];
@@ -2603,9 +2683,9 @@ DataUtil = {
 		return `${toCsv(headers)}\n${rows.map(r => toCsv(r)).join("\n")}`;
 	},
 
-	userDownload (filename, data, {fileType = null, isSipAdditionalMetadata = false, propVersion = "siteVersion", valVersion = VERSION_NUMBER} = {}) {
+	userDownload (filename, data, {fileType = null, isSkipAdditionalMetadata = false, propVersion = "siteVersion", valVersion = VERSION_NUMBER} = {}) {
 		filename = `${filename}.json`;
-		if (isSipAdditionalMetadata || data instanceof Array) return DataUtil._userDownload(filename, JSON.stringify(data, null, "\t"), "text/json");
+		if (isSkipAdditionalMetadata || data instanceof Array) return DataUtil._userDownload(filename, JSON.stringify(data, null, "\t"), "text/json");
 
 		data = {[propVersion]: valVersion, ...data};
 		if (fileType != null) data = {fileType, ...data};
@@ -2793,6 +2873,7 @@ DataUtil = {
 			page: true,
 			otherSources: true,
 			srd: true,
+			basicRules: true,
 			hasFluff: true,
 			hasFluffImages: true,
 			hasToken: true,
@@ -2821,6 +2902,17 @@ DataUtil = {
 				displayText,
 				others,
 			};
+		},
+
+		getNormalizedUid (uid, tag) {
+			const {name, source} = DataUtil.generic.unpackUid(uid, tag, {isLower: true});
+			return [name, source].join("|");
+		},
+
+		getUid (ent) {
+			const {name, source} = ent;
+			if (!name || !source) throw new Error(`Entity did not have a name and source!`);
+			return [name, source].join("|").toLowerCase();
 		},
 
 		async _pMergeCopy (impl, page, entryList, entry, options) {
@@ -3458,9 +3550,10 @@ DataUtil = {
 	},
 
 	proxy: {
-		getVersions (prop, ent) {
-			return (DataUtil[prop]?.getVersions || DataUtil.generic.getVersions)(ent);
-		},
+		getVersions (prop, ent) { return (DataUtil[prop]?.getVersions || DataUtil.generic.getVersions)(ent); },
+		unpackUid (prop, uid, tag, opts) { return (DataUtil[prop]?.unpackUid || DataUtil.generic.unpackUid)(uid, tag, opts); },
+		getNormalizedUid (prop, uid, tag, opts) { return (DataUtil[prop]?.getNormalizedUid || DataUtil.generic.getNormalizedUid)(uid, tag, opts); },
+		getUid (prop, ent) { return (DataUtil[prop]?.getUid || DataUtil.generic.getUid)(ent); },
 	},
 
 	monster: {
@@ -3703,9 +3796,7 @@ DataUtil = {
 	},
 
 	race: {
-		_MERGE_REQUIRES_PRESERVE: {
-			subraces: true,
-		},
+		_MERGE_REQUIRES_PRESERVE: {},
 		_mergeCache: {},
 		async pMergeCopy (raceList, race, options) {
 			return DataUtil.generic._pMergeCopy(DataUtil.race, UrlUtil.PG_RACES, raceList, race, options);
@@ -3716,21 +3807,67 @@ DataUtil = {
 		async loadJSON ({isAddBaseRaces = false} = {}) {
 			if (!DataUtil.race._pIsLoadings[isAddBaseRaces]) {
 				DataUtil.race._pIsLoadings[isAddBaseRaces] = (async () => {
-					const rawRaceData = await DataUtil.loadJSON(`${Renderer.get().baseUrl}data/races.json`);
-					const raceData = Renderer.race.mergeSubraces(rawRaceData.race, {isAddBaseRaces});
-					raceData.forEach(it => it.__prop = "race");
-					DataUtil.race._loadCache[isAddBaseRaces] = {race: raceData};
+					DataUtil.race._loadCache[isAddBaseRaces] = DataUtil.race.getPostProcessedSiteJson(
+						await DataUtil.loadJSON(`${Renderer.get().baseUrl}data/races.json`),
+						{isAddBaseRaces},
+					);
 				})();
 			}
 			await DataUtil.race._pIsLoadings[isAddBaseRaces];
 			return DataUtil.race._loadCache[isAddBaseRaces];
 		},
 
+		async loadRawJSON () {
+			return DataUtil.loadJSON(`${Renderer.get().baseUrl}data/races.json`);
+		},
+
+		getPostProcessedSiteJson (rawRaceData, {isAddBaseRaces = false} = {}) {
+			rawRaceData = MiscUtil.copy(rawRaceData);
+			(rawRaceData.subrace || []).forEach(sr => {
+				const r = rawRaceData.race.find(it => it.name === sr.raceName && it.source === sr.raceSource);
+				if (!r) return JqueryUtil.doToast({content: `Failed to find race "${sr.raceName}" (${sr.raceSource})`, type: "danger"});
+				const cpySr = MiscUtil.copy(sr);
+				delete cpySr.raceName;
+				delete cpySr.raceSource;
+				(r.subraces = r.subraces || []).push(sr);
+			});
+			delete rawRaceData.subrace;
+			const raceData = Renderer.race.mergeSubraces(rawRaceData.race, {isAddBaseRaces});
+			raceData.forEach(it => it.__prop = "race");
+			return {race: raceData};
+		},
+
 		async loadBrew ({isAddBaseRaces = true} = {}) {
+			const rawSite = await DataUtil.race.loadRawJSON();
 			const brew = await BrewUtil.pAddBrewData();
-			let fromBrew = MiscUtil.copy(brew.race || []);
-			fromBrew = Renderer.race.mergeSubraces(fromBrew, {isAddBaseRaces});
-			return {race: fromBrew};
+			return DataUtil.race.getPostProcessedBrewJson(rawSite, brew, {isAddBaseRaces});
+		},
+
+		getPostProcessedBrewJson (rawSite, brew, {isAddBaseRaces = false} = {}) {
+			rawSite = MiscUtil.copy(rawSite);
+			brew = MiscUtil.copy(brew);
+
+			const rawSiteUsed = [];
+			(brew.subrace || []).forEach(sr => {
+				const rSite = rawSite.race.find(it => it.name === sr.raceName && it.source === sr.raceSource);
+				const rBrew = (brew.race || []).find(it => it.name === sr.raceName && it.source === sr.raceSource);
+				if (!rSite && !rBrew) return JqueryUtil.doToast({content: `Failed to find race "${sr.raceName}" (${sr.raceSource})`, type: "danger"});
+				const rTgt = rSite || rBrew;
+				const cpySr = MiscUtil.copy(sr);
+				delete cpySr.raceName;
+				delete cpySr.raceSource;
+				(rTgt.subraces = rTgt.subraces || []).push(sr);
+				if (rSite && !rawSiteUsed.includes(rSite)) rawSiteUsed.push(rSite);
+			});
+			delete brew.subrace;
+
+			const raceDataBrew = Renderer.race.mergeSubraces(brew.race || [], {isAddBaseRaces});
+			// Never add base races from site races when building brew race list
+			const raceDataSite = Renderer.race.mergeSubraces(rawSiteUsed, {isAddBaseRaces: false});
+
+			const out = [...raceDataBrew, ...raceDataSite];
+			out.forEach(it => it.__prop = "race");
+			return {race: out};
 		},
 	},
 
@@ -3898,7 +4035,7 @@ DataUtil = {
 			const byLevel = {}; // Build a map of `level: [classFeature]`
 			for (const classFeatureRef of (cls.classFeatures || [])) {
 				const uid = classFeatureRef.classFeature ? classFeatureRef.classFeature : classFeatureRef;
-				const {name, className, classSource, level, source} = DataUtil.class.unpackUidClassFeature(uid);
+				const {name, className, classSource, level, source, displayText} = DataUtil.class.unpackUidClassFeature(uid);
 				if (!name || !className || !level || isNaN(level)) continue; // skip over broken links
 
 				if (source === SRC_5ETOOLS_TMP) continue; // Skip over temp/nonexistent links
@@ -3915,7 +4052,11 @@ DataUtil = {
 					continue;
 				}
 
+				if (displayText) classFeature._displayName = displayText;
+				if (classFeatureRef.tableDisplayName) classFeature._displayNameTable = classFeatureRef.tableDisplayName;
+
 				if (classFeatureRef.gainSubclassFeature) classFeature.gainSubclassFeature = true;
+				if (classFeatureRef.gainSubclassFeatureHasContent) classFeature.gainSubclassFeatureHasContent = true;
 
 				if (cls.otherSources && cls.source === classFeature.source) classFeature.otherSources = MiscUtil.copy(cls.otherSources);
 
@@ -3945,8 +4086,11 @@ DataUtil = {
 
 			for (const subclassFeatureRef of (sc.subclassFeatures || [])) {
 				const uid = subclassFeatureRef.subclassFeature ? subclassFeatureRef.subclassFeature : subclassFeatureRef;
-				const {name, className, classSource, subclassShortName, subclassSource, level, source} = DataUtil.class.unpackUidSubclassFeature(uid);
+				const {name, className, classSource, subclassShortName, subclassSource, level, source, displayText} = DataUtil.class.unpackUidSubclassFeature(uid);
 				if (!name || !className || !subclassShortName || !level || isNaN(level)) continue; // skip over broken links
+
+				if (source === SRC_5ETOOLS_TMP) continue; // Skip over temp/nonexistent links
+
 				const hash = UrlUtil.URL_TO_HASH_BUILDER["subclassFeature"]({name, className, classSource, subclassShortName, subclassSource, level, source});
 
 				// Skip blacklisted
@@ -3958,6 +4102,8 @@ DataUtil = {
 					JqueryUtil.doToast({type: "danger", content: `Failed to find <code>subclassFeature</code> <code>${uid}</code>`});
 					continue;
 				}
+
+				if (displayText) subclassFeature._displayName = displayText;
 
 				if (sc.otherSources && sc.source === subclassFeature.source) subclassFeature.otherSources = MiscUtil.copy(sc.otherSources);
 
@@ -4052,6 +4198,8 @@ DataUtil = {
 				laterPrinting.push(src);
 			});
 			data.deity.forEach(g => g._isEnhanced = true);
+
+			return data;
 		},
 
 		loadJSON: async function () {
@@ -4338,7 +4486,6 @@ RollerUtil = {
 
 	getColRollType (colLabel) {
 		if (typeof colLabel !== "string") return false;
-		if (/^{@dice [^}]+}$/.test(colLabel.trim())) return true;
 		colLabel = Renderer.stripTags(colLabel);
 
 		if (Renderer.dice.lang.getTree3(colLabel)) return RollerUtil.ROLL_COL_STANDARD;
@@ -4347,7 +4494,7 @@ RollerUtil = {
 		colLabel = colLabel.replace(RollerUtil._REGEX_ROLLABLE_COL_LABEL, "$1");
 		if (Renderer.dice.lang.getTree3(colLabel)) return RollerUtil.ROLL_COL_VARIABLE;
 
-		return 0;
+		return RollerUtil.ROLL_COL_NONE;
 	},
 
 	getFullRollCol (lbl) {
@@ -4632,11 +4779,13 @@ BrewUtil = {
 
 				await this._pAddLocalBrewData(homebrew);
 
-				BrewUtil._mutMakeBrewCompatible(homebrew);
+				const isMigration = BrewUtil._mutMakeBrewCompatible(homebrew);
 
 				BrewUtil.homebrew = homebrew;
 
 				BrewUtil._resetSourceCache();
+
+				if (isMigration) BrewUtil._persistHomebrewDebounced();
 
 				return BrewUtil.homebrew;
 			} catch (e) {
@@ -4646,25 +4795,20 @@ BrewUtil = {
 	},
 
 	_mutMakeBrewCompatible (homebrew) {
-		let hasOldSubclasses = false;
+		let isMigration = false;
 
-		if (homebrew.class) {
-			homebrew.class.forEach(cls => {
-				if (cls.subclasses) {
-					hasOldSubclasses = true;
-					cls.subclasses.forEach(sc => {
-						sc.className = sc.className || cls.name;
-						sc.classSource = sc.classSource || cls.source;
-						(homebrew.subclass = homebrew.subclass || []).push(sc);
-					});
-					delete cls.subclasses;
-				}
+		// region Race
+		if (homebrew.subrace) {
+			homebrew.subrace.forEach(sr => {
+				if (!sr.race) return;
+				isMigration = true;
+				sr.raceName = sr.race.name;
+				sr.raceSource = sr.race.source || sr.source || SRC_PHB;
 			});
 		}
+		// endregion
 
-		if (hasOldSubclasses) {
-			JqueryUtil.doToast({type: "warning", content: `Converted legacy homebrew subclasses\u2014you should re-load your class homebrews, as this backwards compatibility will be removed in future!`});
-		}
+		return isMigration;
 	},
 
 	async pPurgeBrew (error) {
@@ -4704,7 +4848,7 @@ BrewUtil = {
 
 		const page = BrewUtil._PAGE || UrlUtil.getCurrentPage();
 
-		const $brewList = $(`<div class="manbrew__current_brew flex-col h-100 mt-1"></div>`);
+		const $brewList = $(`<div class="manbrew__current_brew ve-flex-col h-100 mt-1"></div>`);
 
 		await BrewUtil._pRenderBrewScreen_pRefreshBrewList($brewList);
 
@@ -4763,17 +4907,17 @@ BrewUtil = {
 
 		const $btnDelAll = opts.isModal ? null : BrewUtil._$getBtnDeleteAll();
 
-		const $wrpBtns = $$`<div class="flex-vh-center no-shrink mobile__flex-col">
-			<div class="flex-v-center mobile__mb-2">
-				<div class="flex-v-center btn-group mr-2">
+		const $wrpBtns = $$`<div class="ve-flex-vh-center no-shrink mobile__ve-flex-col">
+			<div class="ve-flex-v-center mobile__mb-2">
+				<div class="ve-flex-v-center btn-group mr-2">
 					${$btnGet}
 					${$btnCustomUrl}
 				</div>
 				${$btnLoadFromFile}
 				${$btnLoadFromUrl}
 			</div>
-			<div class="flex-v-center">
-				<a href="https://github.com/TheGiddyLimit/homebrew" class="flex-v-center" target="_blank" rel="noopener noreferrer"><button class="btn btn-default btn-sm">Browse Source Repository</button></a>
+			<div class="ve-flex-v-center">
+				<a href="https://github.com/TheGiddyLimit/homebrew" class="ve-flex-v-center" target="_blank" rel="noopener noreferrer"><button class="btn btn-default btn-sm">Browse Source Repository</button></a>
 				${$btnDelAll}
 			</div>
 		</div>`;
@@ -4809,7 +4953,7 @@ BrewUtil = {
 
 		const $btnAll = $(`<button class="btn btn-default btn-xs" disabled title="(Excluding samples)">Add All</button>`);
 
-		const $wrpRows = $$`<div class="list"><div class="lst__row flex-col"><div class="lst__wrp-cells lst--border lst__row-inner flex w-100"><span style="font-style: italic;">Loading...</span></div></div></div>`;
+		const $wrpRows = $$`<div class="list"><div class="lst__row ve-flex-col"><div class="lst__wrp-cells lst--border lst__row-inner ve-flex w-100"><span style="font-style: italic;">Loading...</span></div></div></div>`;
 
 		const $iptSearch = $(`<input type="search" class="search manbrew__search form-control w-100" placeholder="Find homebrew...">`)
 			.keydown(evt => {
@@ -4837,9 +4981,9 @@ BrewUtil = {
 		<div class="mt-1"><i>A list of homebrew available in the public repository. Click a name to load the homebrew, or view the source directly.<br>
 		Contributions are welcome; see the <a href="https://github.com/TheGiddyLimit/homebrew/blob/master/README.md" target="_blank" rel="noopener noreferrer">README</a>, or stop by our <a href="https://discord.gg/5etools" target="_blank" rel="noopener noreferrer">Discord</a>.</i></div>
 		<hr class="hr-1">
-		<div class="flex-h-right mb-1">${$btnToggleDisplayNonPageBrews}${$btnAll}</div>
+		<div class="ve-flex-h-right mb-1">${$btnToggleDisplayNonPageBrews}${$btnAll}</div>
 		${$iptSearch}
-		<div class="filtertools manbrew__filtertools btn-group input-group input-group--bottom flex no-shrink">
+		<div class="filtertools manbrew__filtertools btn-group input-group input-group--bottom ve-flex no-shrink">
 			<button class="col-4 sort btn btn-default btn-xs" data-sort="name">Name</button>
 			<button class="col-3 sort btn btn-default btn-xs" data-sort="author">Author</button>
 			<button class="col-1-2 sort btn btn-default btn-xs" data-sort="category">Category</button>
@@ -4926,7 +5070,7 @@ BrewUtil = {
 				.click(() => BrewUtil.addBrewRemote($btnAdd, it.download_url || "", true));
 
 			const $row = $$`<div class="lst__row lst__row-inner not-clickable lst--border lst__row--focusable" tabindex="1">
-				<div class="lst__wrp-cells flex w-100">
+				<div class="lst__wrp-cells ve-flex w-100">
 					${$btnAdd}
 					<span class="col-3">${it._brewAuthor}</span>
 					<span class="col-1-2 text-center">${it._brewCat}</span>
@@ -5022,11 +5166,12 @@ BrewUtil = {
 			});
 	},
 
+	_ALLOWED_BREW_UNDER_PROPS: new Set(["__prop"]),
 	async _pCleanSaveBrew () {
 		const cpy = MiscUtil.copy(BrewUtil.homebrew || {});
 		BrewUtil._STORABLE.forEach(prop => {
 			(cpy[prop] || []).forEach(ent => {
-				Object.keys(ent).filter(k => k.startsWith("_")).forEach(k => delete ent[k]);
+				Object.keys(ent).filter(k => !BrewUtil._ALLOWED_BREW_UNDER_PROPS.has(k) && k.startsWith("_")).forEach(k => delete ent[k]);
 			});
 		});
 		await StorageUtil.pSet(VeCt.STORAGE_HOMEBREW, cpy);
@@ -5058,7 +5203,7 @@ BrewUtil = {
 
 	async _pRenderBrewScreen_pRefreshBrewList ($brewList) {
 		function showSourceManager (source, showAll) {
-			const $wrpBtnDel = $(`<div class="flex-v-center"></div>`);
+			const $wrpBtnDel = $(`<div class="ve-flex-v-center"></div>`);
 
 			const {$modalInner, doClose} = UiUtil.getShowModal({
 				isHeight100: true,
@@ -5071,12 +5216,12 @@ BrewUtil = {
 			});
 
 			const $cbAll = $(`<input type="checkbox">`);
-			const $wrpRows = $$`<div class="list flex-col w-100"></div>`;
+			const $wrpRows = $$`<div class="list ve-flex-col w-100"></div>`;
 			const $iptSearch = $(`<input type="search" class="search manbrew__search form-control w-100 mt-1" placeholder="Search entries...">`);
 			const $wrpBtnsSort = $$`<div class="filtertools manbrew__filtertools btn-group">
 				<button class="col-6 sort btn btn-default btn-xs" data-sort="name">Name</button>
 				<button class="col-5 sort btn btn-default btn-xs" data-sort="category">Category</button>
-				<label class="wrp-cb-all pr-0 flex-vh-center mb-0 h-100">${$cbAll}</label>
+				<label class="wrp-cb-all pr-0 ve-flex-vh-center mb-0 h-100">${$cbAll}</label>
 			</div>`;
 			$$($modalInner)`
 				${$iptSearch}
@@ -5139,15 +5284,15 @@ BrewUtil = {
 						.map(it => mapCategoryEntry(cat, it))
 						.sort((a, b) => SortUtil.ascSort(a.name, b.name))
 						.forEach((it, i) => {
-							const dispCat = BrewUtil._pRenderBrewScreen_getDisplayCat(cat, true);
+							const dispCat = BrewUtil._pRenderBrewScreen_getDisplayCat(cat, {isManager: true});
 
 							const eleLi = document.createElement("div");
-							eleLi.className = "lst__row flex-col px-0";
+							eleLi.className = "lst__row ve-flex-col px-0";
 
-							eleLi.innerHTML = `<label class="lst--border lst__row-inner no-select mb-0 flex-v-center">
+							eleLi.innerHTML = `<label class="lst--border lst__row-inner no-select mb-0 ve-flex-v-center">
 								<div class="col-6 bold">${it.name}</div>
-								<div class="col-5 flex-vh-center">${dispCat}${it.extraInfo}</div>
-								<div class="pr-0 col-1 flex-vh-center"><input type="checkbox" class="no-events"></div>
+								<div class="col-5 ve-flex-vh-center">${dispCat}${it.extraInfo}</div>
+								<div class="pr-0 col-1 ve-flex-vh-center"><input type="checkbox" class="no-events"></div>
 							</label>`;
 
 							const listItem = new ListItem(
@@ -5205,8 +5350,8 @@ BrewUtil = {
 		if (!BrewUtil.homebrew) return;
 
 		const $iptSearch = $(`<input type="search" class="search manbrew__search form-control" placeholder="Search active homebrew...">`);
-		const $wrpList = $(`<div class="list-display-only brew-list brew-list--target manbrew__list flex-col w-100 mb-3"></div>`);
-		const $wrpListGroup = $(`<div class="list-display-only brew-list brew-list--groups no-shrink flex-col w-100" style="height: initial;"></div>`);
+		const $wrpList = $(`<div class="list-display-only smooth-scroll overflow-y-auto h-100 brew-list brew-list--target manbrew__list ve-flex-col w-100 mb-3"></div>`);
+		const $wrpListGroup = $(`<div class="list-display-only smooth-scroll overflow-y-auto brew-list brew-list--groups no-shrink ve-flex-col w-100" style="height: initial;"></div>`);
 
 		const list = new List({
 			$iptSearch,
@@ -5217,15 +5362,15 @@ BrewUtil = {
 		});
 
 		const $lst = $$`
-			<div class="flex-col h-100">
+			<div class="ve-flex-col h-100">
 				${$iptSearch}
-				<div class="filtertools manbrew__filtertools btn-group input-group input-group--bottom flex no-shrink">
+				<div class="filtertools manbrew__filtertools btn-group input-group input-group--bottom ve-flex no-shrink">
 					<button class="col-5 sort btn btn-default btn-xs ve-grow" data-sort="source">Source</button>
 					<button class="col-5 sort btn btn-default btn-xs" data-sort="authors">Authors</button>
 					<button class="col-1 btn btn-default btn-xs" disabled>Origin</button>
 					<button class="col-1 ve-grow btn btn-default btn-xs" disabled>&nbsp;</button>
 				</div>
-				<div class="flex w-100 h-100 overflow-y-auto relative">${$wrpList}</div>
+				<div class="ve-flex w-100 h-100 overflow-y-auto relative">${$wrpList}</div>
 			</div>
 		`.appendTo($brewList);
 		$wrpListGroup.appendTo($brewList);
@@ -5264,7 +5409,7 @@ BrewUtil = {
 			const $btnDeleteAll = $(`<button class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>`)
 				.on("click", () => BrewUtil._pRenderBrewScreen_pDeleteSource($brewList, src.json, true, src._all));
 
-			$$`<div class="${isFooterGroup ? `flex-v-center flex-h-right` : `flex-vh-center ve-grow`} btn-group">
+			$$`<div class="${isFooterGroup ? `ve-flex-v-center ve-flex-h-right` : `ve-flex-vh-center ve-grow`} btn-group">
 				${$btnViewManage}
 				${btnConvertedBy}
 				${$btnDeleteAll}
@@ -5279,7 +5424,7 @@ BrewUtil = {
 			const validAuthors = (!src.authors ? [] : !(src.authors instanceof Array) ? [] : src.authors).join(", ");
 			const isGroup = src._unknown || src._all;
 
-			const $row = $(`<div class="manbrew__row flex-v-center lst__row lst--border lst__row-inner no-shrink">
+			const $row = $(`<div class="manbrew__row ve-flex-v-center lst__row lst--border lst__row-inner no-shrink">
 				<span class="col-5 source manbrew__source">${isGroup ? "<i>" : ""}${src.full}${isGroup ? "</i>" : ""}</span>
 				<span class="col-5 authors">${validAuthors}</span>
 				<${src.url ? "a" : "span"} class="col-1 text-center" ${src.url ? `href="${src.url}" target="_blank" rel="noopener noreferrer"` : ""}>${src.url ? "View Source" : ""}</${src.url ? "a" : "span"}>
@@ -5300,7 +5445,7 @@ BrewUtil = {
 		});
 
 		const createGroupRow = (fullText, modeProp) => {
-			const $row = $(`<div class="manbrew__row flex-h-right flex-v-center">
+			const $row = $(`<div class="manbrew__row ve-flex-h-right ve-flex-v-center">
 				<div class="source manbrew__source text-right"><i class="mr-3">${fullText}</i></div>
 			</div>`);
 			createButtons({[modeProp]: true}, $row, true);
@@ -5375,28 +5520,14 @@ BrewUtil = {
 		}
 	},
 
-	_pRenderBrewScreen_getDisplayCat (cat, isManager) {
-		switch (cat) {
-			case "variantrule": return "Variant Rule";
-			case "legendaryGroup": return "Legendary Group";
-			case "optionalfeature": return "Optional Feature";
-			case "adventure": return isManager ? "Adventure Contents/Info" : "Adventure";
-			case "adventureData": return "Adventure Text";
-			case "book": return isManager ? "Book Contents/Info" : "Book";
-			case "bookData": return "Book Text";
-			case "itemProperty": return "Item Property";
-			case "itemEntry": return "Item Entry";
-			case "baseitem": return "Base Item";
-			case "variant": return "Magic Item Variant";
-			case "itemGroup": return "Item Group";
-			case "monsterFluff": return "Monster Fluff";
-			case "itemFluff": return "Item Fluff";
-			case "makebrewCreatureTrait": return "Homebrew Builder Creature Trait";
-			case "classFeature": return "Class Feature";
-			case "subclassFeature": return "Subclass Feature";
-			case "charoption": return "Other Character Creation Option";
-			default: return cat.uppercaseFirst();
+	_pRenderBrewScreen_getDisplayCat (prop, {isManager = false} = {}) {
+		if (isManager) {
+			switch (prop) {
+				case "adventure": return "Adventure Contents/Info";
+				case "book": return "Book Contents/Info";
+			}
 		}
+		return Parser.getPropDisplayName(prop);
 	},
 
 	handleLoadbrewClick: async (ele) => {
@@ -5608,7 +5739,7 @@ BrewUtil = {
 		obj.uniqueId = CryptUtil.md5(JSON.stringify(obj));
 	},
 
-	_DIRS: ["action", "adventure", "background", "book", "boon", "charoption", "class", "condition", "creature", "cult", "deity", "disease", "feat", "hazard", "item", "language", "magicvariant", "makebrew", "object", "optionalfeature", "psionic", "race", "recipe", "reward", "spell", "spellFluff", /* "status", */ "subclass", "subrace", "table", "trap", "variantrule", "vehicle", "classFeature", "subclassFeature"],
+	_DIRS: ["action", "adventure", "background", "book", "boon", "charoption", "class", "condition", "creature", "cult", "deity", "disease", "feat", "hazard", "item", "language", "magicvariant", "makebrew", "object", "optionalfeature", "psionic", "race", "recipe", "reward", "spell", /* "status", */ "subclass", "subrace", "table", "trap", "variantrule", "vehicle", "classFeature", "subclassFeature"],
 	_STORABLE: ["class", "subclass", "classFeature", "subclassFeature", "spell", "spellFluff", "monster", "legendaryGroup", "monsterFluff", "background", "feat", "optionalfeature", "race", "raceFluff", "subrace", "deity", "item", "baseitem", "variant", "itemProperty", "itemType", "itemFluff", "itemGroup", "itemEntry", "psionic", "reward", "object", "trap", "hazard", "variantrule", "condition", "disease", "status", "adventure", "adventureData", "book", "bookData", "table", "tableGroup", "vehicle", "vehicleUpgrade", "action", "cult", "boon", "language", "languageScript", "makebrewCreatureTrait", "charoption", "charoptionFluff", "recipe"],
 	async pDoHandleBrewJson (json, page, pFuncRefresh) {
 		page = BrewUtil._PAGE || page;
@@ -5677,16 +5808,16 @@ BrewUtil = {
 			// in development mode, replace any existing brew
 			const existingLookup = {};
 			homebrew[prop].forEach(it => {
-				const brewHash = BrewUtil._getDevBrewHash(page, prop, it);
+				const brewHash = BrewUtil._getDevBrewHash(prop, it);
 				existingLookup[brewHash] = it.uniqueId;
 			});
 
 			const pDeleteFn = BrewUtil._getPDeleteFunction(prop);
 			for (const entity of json[prop]) {
-				const brewHash = BrewUtil._getDevBrewHash(page, prop, entity);
+				const brewHash = BrewUtil._getDevBrewHash(prop, entity);
 				if (existingLookup[brewHash] && entity.uniqueId !== existingLookup[brewHash]) {
 					if (isLocalPreload) {
-						const ixExisting = homebrew[prop].findIndex(ex => BrewUtil._getDevBrewHash(page, prop, ex) === brewHash);
+						const ixExisting = homebrew[prop].findIndex(ex => BrewUtil._getDevBrewHash(prop, ex) === brewHash);
 						if (~ixExisting) homebrew[prop].splice(ixExisting, 1);
 					} else {
 						await pDeleteFn(existingLookup[brewHash]);
@@ -5781,6 +5912,7 @@ BrewUtil = {
 					break;
 				case UrlUtil.PG_MANAGE_BREW:
 				case UrlUtil.PG_DEMO_RENDER:
+				case UrlUtil.PG_MAPS:
 				case VeCt.PG_NONE:
 					// No-op
 					break;
@@ -5806,13 +5938,16 @@ BrewUtil = {
 		}
 	},
 
-	_getDevBrewHash (page, prop, it) {
-		return UrlUtil.URL_TO_HASH_BUILDER[page]
-			? UrlUtil.URL_TO_HASH_BUILDER[page](it)
-			: UrlUtil.URL_TO_HASH_BUILDER[prop]
-				? UrlUtil.URL_TO_HASH_BUILDER[prop](it)
-				// Handle magic variants
-				: `${it.inherits && it.inherits.source ? it.inherits.source : it.source}__${it.name}`;
+	_getDevBrewHash (prop, it) {
+		if (UrlUtil.URL_TO_HASH_BUILDER[prop]) return UrlUtil.URL_TO_HASH_BUILDER[prop](it);
+		// Handle magic variants; subraces; etc
+		const name = it.name;
+		const source = it.inherits?.source ?? it.source;
+		if (name || source) return `${source}__${name}`;
+		// Item properties
+		if (it.abbreviation) return it.abbreviation;
+		// As a last resort, randomise the ID. We prefer accidentally duplicating to accidentally deleting.
+		return CryptUtil.uid();
 	},
 
 	makeBrewButton: (id) => {
@@ -6272,23 +6407,20 @@ CollectionUtil = {
 	},
 
 	deepEquals (a, b) {
-		if (CollectionUtil._eq_sameValueZeroEqual(a, b)) return true;
+		if (Object.is(a, b)) return true;
 		if (a && b && typeof a === "object" && typeof b === "object") {
 			if (CollectionUtil._eq_isPlainObject(a) && CollectionUtil._eq_isPlainObject(b)) return CollectionUtil._eq_areObjectsEqual(a, b);
-			const arrayA = Array.isArray(a);
-			const arrayB = Array.isArray(b);
-			if (arrayA || arrayB) return arrayA === arrayB && CollectionUtil._eq_areArraysEqual(a, b);
-			const setA = a instanceof Set;
-			const setB = b instanceof Set;
-			if (setA || setB) return setA === setB && CollectionUtil.setEq(a, b);
+			const isArrayA = Array.isArray(a);
+			const isArrayB = Array.isArray(b);
+			if (isArrayA || isArrayB) return isArrayA === isArrayB && CollectionUtil._eq_areArraysEqual(a, b);
+			const isSetA = a instanceof Set;
+			const isSetB = b instanceof Set;
+			if (isSetA || isSetB) return isSetA === isSetB && CollectionUtil.setEq(a, b);
 			return CollectionUtil._eq_areObjectsEqual(a, b);
 		}
 		return false;
 	},
 
-	// This handles the NaN != NaN case; ignore linter complaints
-	// eslint-disable-next-line no-self-compare
-	_eq_sameValueZeroEqual: (a, b) => a === b || (a !== a && b !== b),
 	_eq_isPlainObject: (value) => value.constructor === Object || value.constructor == null,
 	_eq_areObjectsEqual (a, b) {
 		const keysA = Object.keys(a);
@@ -6441,7 +6573,7 @@ Array.prototype.mergeMap || Object.defineProperty(Array.prototype, "mergeMap", {
 	enumerable: false,
 	writable: true,
 	value: function (fnMap) {
-		return this.map((...args) => fnMap(...args)).reduce((a, b) => Object.assign(a, b), {});
+		return this.map((...args) => fnMap(...args)).filter(it => it != null).reduce((a, b) => Object.assign(a, b), {});
 	},
 });
 
@@ -6651,7 +6783,7 @@ function BookModeView (opts) {
 	this._renderContent = async ($wrpContent, $dispName, $wrpControlsToPass) => {
 		this._$wrpRenderedContent = this._$wrpRenderedContent
 			? this._$wrpRenderedContent.empty().append($wrpContent)
-			: $$`<div class="bkmv__scroller h-100 overflow-y-auto ${isFlex ? "flex" : ""}">${this.isHideContentOnNoneShown ? null : $wrpContent}</div>`;
+			: $$`<div class="bkmv__scroller h-100 overflow-y-auto ${isFlex ? "ve-flex" : ""}">${this.isHideContentOnNoneShown ? null : $wrpContent}</div>`;
 		this._$wrpRenderedContent.appendTo(this._$wrpBook);
 
 		const numShown = await this.popTblGetNumShown({$wrpContent, $dispName, $wrpControls: $wrpControlsToPass});
@@ -6667,16 +6799,16 @@ function BookModeView (opts) {
 				const $btnClose = $(`<button class="btn btn-default">Close</button>`)
 					.click(() => this.close());
 
-				this._$wrpNoneShown = $$`<div class="w-100 flex-col flex-h-center no-shrink bkmv__footer mb-3">
-					<div class="mb-2 flex-vh-center min-h-0">${this.$eleNoneVisible}</div>
-					${this.isHideButtonCloseNone ? null : $$`<div class="flex-vh-center">${$btnClose}</div>`}
+				this._$wrpNoneShown = $$`<div class="w-100 ve-flex-col ve-flex-h-center no-shrink bkmv__footer mb-3">
+					<div class="mb-2 ve-flex-vh-center min-h-0">${this.$eleNoneVisible}</div>
+					${this.isHideButtonCloseNone ? null : $$`<div class="ve-flex-vh-center">${$btnClose}</div>`}
 				</div>`;
 			}
 			this._$wrpNoneShown.appendTo(this.isHideContentOnNoneShown ? this._$wrpRenderedContent : this._$wrpBook);
 		}
 	};
 
-	// NOTE: Avoid using `flex` css, as it doesn't play nice with printing
+	// NOTE: Avoid using `ve-flex` css, as it doesn't play nice with printing
 	this.pOpen = async () => {
 		if (this.active) return;
 		this.active = true;
@@ -6695,7 +6827,7 @@ function BookModeView (opts) {
 
 		// region controls
 		// Optionally usable "controls" section at the top of the pane
-		const $wrpControls = $(`<div class="w-100 flex-col bkmv__wrp-controls"></div>`)
+		const $wrpControls = $(`<div class="w-100 ve-flex-col bkmv__wrp-controls"></div>`)
 			.appendTo(this._$wrpBook);
 
 		let $wrpControlsToPass = $wrpControls;
@@ -6724,8 +6856,8 @@ function BookModeView (opts) {
 			if (lastColumns != null) $selColumns.val(lastColumns);
 			$selColumns.change();
 
-			$wrpControlsToPass = $$`<div class="w-100 flex">
-				<div class="flex-vh-center"><div class="mr-2 no-wrap help-subtle" title="Applied when printing the page.">Print columns:</div>${$selColumns}</div>
+			$wrpControlsToPass = $$`<div class="w-100 ve-flex">
+				<div class="ve-flex-vh-center"><div class="mr-2 no-wrap help-subtle" title="Applied when printing the page.">Print columns:</div>${$selColumns}</div>
 			</div>`.appendTo($wrpControls);
 		}
 		// endregion
@@ -6791,7 +6923,7 @@ ExcludeUtil = {
 	},
 
 	getList () {
-		return ExcludeUtil._excludes || [];
+		return MiscUtil.copy(ExcludeUtil._excludes || []);
 	},
 
 	async pSetList (toSet) {
@@ -6813,7 +6945,7 @@ ExcludeUtil = {
 		opts = opts || {};
 
 		source = source.source || source;
-		const out = !!ExcludeUtil._excludes.find(row => (row.source === "*" || row.source === source) && (row.category === "*" || row.category === category) && (row.hash === "*" || row.hash === hash));
+		const out = !!ExcludeUtil._excludes.find(row => (row.source === "*" || (row.source || "").toLowerCase() === (source || "").toLowerCase()) && (row.category === "*" || row.category === category) && (row.hash === "*" || row.hash === hash));
 		if (out && !opts.isNoCount) ++ExcludeUtil._excludeCount;
 		return out;
 	},
@@ -6821,34 +6953,12 @@ ExcludeUtil = {
 	isAllContentExcluded (list) { return (!list.length && ExcludeUtil._excludeCount) || (list.length > 0 && list.length === ExcludeUtil._excludeCount); },
 	getAllContentBlacklistedHtml () { return `<div class="initial-message">(All content <a href="blacklist.html">blacklisted</a>)</div>`; },
 
-	addExclude (displayName, hash, category, source) {
-		if (!ExcludeUtil._excludes.find(row => row.source === source && row.category === category && row.hash === hash)) {
-			ExcludeUtil._excludes.push({displayName, hash, category, source});
-			ExcludeUtil.pSave();
-			return true;
-		}
-		return false;
-	},
-
-	removeExclude (hash, category, source) {
-		const ix = ExcludeUtil._excludes.findIndex(row => row.source === source && row.category === category && row.hash === hash);
-		if (~ix) {
-			ExcludeUtil._excludes.splice(ix, 1);
-			ExcludeUtil.pSave();
-		}
-	},
-
 	async _pSave () {
 		return StorageUtil.pSet(VeCt.STORAGE_EXCLUDES, ExcludeUtil._excludes);
 	},
 
 	// The throttled version, available post-initialisation
 	async pSave () { /* no-op */ },
-
-	resetExcludes () {
-		ExcludeUtil._excludes = [];
-		ExcludeUtil.pSave();
-	},
 };
 
 // ENCOUNTERS ==========================================================================================================
@@ -6933,7 +7043,7 @@ ExtensionUtil = {
 	},
 
 	async pDoSendStats (evt, ele) {
-		const $parent = $(ele).closest(`th.rnd-name`);
+		const $parent = $(ele).closest(`[data-page]`);
 		const page = $parent.attr("data-page");
 		const source = $parent.attr("data-source");
 		const hash = $parent.attr("data-hash");
@@ -7073,10 +7183,8 @@ if (!IS_VTT && typeof window !== "undefined") {
 		$(document.body)
 			.on("click", `[data-packed-dice]`, evt => {
 				Renderer.dice.pRollerClickUseData(evt, evt.currentTarget);
-			})
-			.on("click", `[data-rd-data-embed-header]`, evt => {
-				Renderer.events.handleClick_dataEmbedHeader(evt, evt.currentTarget);
 			});
+		Renderer.events.bindGeneric();
 	});
 
 	if (location.origin === VeCt.LOC_ORIGIN_CANCER) {

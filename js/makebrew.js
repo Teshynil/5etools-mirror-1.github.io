@@ -211,10 +211,23 @@ class PageUi {
 				<option value="creatureBuilder">Creature</option>
 				<option value="legendaryGroupBuilder">Legendary Group</option>
 				<option value="spellBuilder">Spell</option>
+				<option value="none" class="italic">Everything Else?</option>
 			</select>
-		`).appendTo($wrpMode).change(() => {
-			this._setActiveBuilder(this._$selBuilderMode.val());
-		});
+		`)
+			.appendTo($wrpMode)
+			.change(() => {
+				const val = this._$selBuilderMode.val();
+				if (val === "none") {
+					InputUiUtil.pGetUserBoolean({
+						title: "Homebrew Builder Support",
+						htmlDescription: `<p>The Homebrew Builder only supports a limited set of entity types. For everything else, you will need to <a href="https://github.com/TheGiddyLimit/homebrew/blob/master/README.md" rel="noopener noreferrer">manually</a> create or convert content.</p>`,
+						isAlert: true,
+					});
+					this._$selBuilderMode.val(this._settings.activeBuilder);
+					return;
+				}
+				this._setActiveBuilder(val);
+			});
 
 		const $btnManageHomebrew = $(`<button class="btn btn-xs btn-info">Manage Homebrew</button>`)
 			.click(() => BrewUtil.manageBrew());
@@ -463,13 +476,13 @@ class Builder extends ProxyBase {
 				const $btnSettings = $(`<button class="btn btn-default btn-xs mb-2"><span class="glyphicon glyphicon-cog"/></button>`)
 					.click(() => RendererMarkdown.pShowSettingsModal());
 
-				return $$`<div class="flex-v-center btn-group">${$btnDownload}${$btnSettings}</div>`;
+				return $$`<div class="ve-flex-v-center btn-group">${$btnDownload}${$btnSettings}</div>`;
 			})();
 
-			this._$sideMenuWrpList = this._$sideMenuWrpList || $(`<div class="sidemenu__row flex-col">`);
+			this._$sideMenuWrpList = this._$sideMenuWrpList || $(`<div class="sidemenu__row ve-flex-col">`);
 			this._$sideMenuStageSaved = $$`<div>
 			${PageUi.__$getSideMenuDivider().hide()}
-			<div class="flex-v-center">${$btnDownloadJson}</div>
+			<div class="ve-flex-v-center">${$btnDownloadJson}</div>
 			${$wrpDownloadMarkdown}
 			${this._$sideMenuWrpList}
 			</div>`;
@@ -647,7 +660,7 @@ class Builder extends ProxyBase {
 
 			const $dispName = $$`<span class="py-1">${entry.name}</span>`;
 
-			const $row = $$`<div class="mkbru__sidebar-entry flex-v-center split px-2" style="order: ${position}">
+			const $row = $$`<div class="mkbru__sidebar-entry ve-flex-v-center split px-2" style="order: ${position}">
 			${$dispName}
 			<div class="py-1 no-shrink">${$btnEdit}${$btnBurger}${$btnDelete}</div>
 			</div>`.appendTo(this._$sideMenuWrpList);
@@ -766,7 +779,7 @@ class Builder extends ProxyBase {
 		};
 
 		const $wrpRowsOuter = $(`<div class="relative"/>`);
-		const $wrpRows = $(`<div class="flex-col"/>`).appendTo($wrpRowsOuter);
+		const $wrpRows = $(`<div class="ve-flex-col"/>`).appendTo($wrpRowsOuter);
 
 		const rowOptions = {$wrpRowsOuter};
 
@@ -781,7 +794,7 @@ class Builder extends ProxyBase {
 				doUpdateState();
 			});
 
-		$$`<div class="flex-col">
+		$$`<div class="ve-flex-col">
 		${$iptEntries}
 		${$wrpRowsOuter}
 		<div>${$btnAddImage}</div>
@@ -841,7 +854,7 @@ class Builder extends ProxyBase {
 			$wrpRowsOuter: options.$wrpRowsOuter,
 		});
 
-		out.$ele = $$`<div class="flex-v-center mb-2 mkbru__wrp-rows--removable">${$iptUrl}${$btnPreview}${$btnRemove}${$dragOrder}</div>`;
+		out.$ele = $$`<div class="ve-flex-v-center mb-2 mkbru__wrp-rows--removable">${$iptUrl}${$btnPreview}${$btnRemove}${$dragOrder}</div>`;
 		out.getState = getState;
 		imageRows.push(out);
 
@@ -922,7 +935,7 @@ class BuilderUi {
 	 * @param [options] Options object.
 	 * @param [options.eleType] HTML element to use.
 	 * @param [options.isMarked] If a "group" vertical marker should be displayed between the name and the row body.
-	 * @param [options.isRow] If the row body should use flex row (instead of flex col).
+	 * @param [options.isRow] If the row body should use ve-flex row (instead of ve-flex col).
 	 * @param [options.title] Tooltip text.
 	 */
 	static getLabelledRowTuple (name, options) {
@@ -930,8 +943,8 @@ class BuilderUi {
 
 		const eleType = options.eleType || "div";
 
-		const $rowInner = $(`<div class="${options.isRow ? "flex" : "flex-col"} w-100"/>`);
-		const $row = $$`<div class="mb-2 mkbru__row stripe-even"><${eleType} class="mkbru__wrp-row flex-v-center"><span class="mr-2 mkbru__row-name ${options.isMarked ? `mkbru__row-name--marked` : ""} ${options.title ? "help" : ""}" ${options.title ? `title="${options.title}"` : ""}>${name}</span>${options.isMarked ? `<div class="mkbru__row-mark mr-2"/>` : ""}${$rowInner}</${eleType}></div>`;
+		const $rowInner = $(`<div class="${options.isRow ? "ve-flex" : "ve-flex-col"} w-100"/>`);
+		const $row = $$`<div class="mb-2 mkbru__row stripe-even"><${eleType} class="mkbru__wrp-row ve-flex-v-center"><span class="mr-2 mkbru__row-name ${options.isMarked ? `mkbru__row-name--marked` : ""} ${options.title ? "help" : ""}" ${options.title ? `title="${options.title}"` : ""}>${name}</span>${options.isMarked ? `<div class="mkbru__row-mark mr-2"/>` : ""}${$rowInner}</${eleType}></div>`;
 		return [$row, $rowInner];
 	}
 
@@ -940,7 +953,7 @@ class BuilderUi {
 
 		const eleType = options.eleType || "div";
 
-		return $$`<div class="mb-2 mkbru__row stripe-even"><${eleType} class="mkbru__wrp-row flex-v-center">
+		return $$`<div class="mb-2 mkbru__row stripe-even"><${eleType} class="mkbru__wrp-row ve-flex-v-center">
 		<span class="mr-2 mkbru__row-name ${options.title ? "help" : ""}" ${options.title ? `title="${options.title}"` : ""}>${name}</span>
 		${$ipt}
 		<${eleType}/></div>`;
@@ -982,7 +995,7 @@ class BuilderUi {
 		const $ipt = $(`<textarea class="form-control form-control--minimal resize-vertical" ${options.placeholder ? `placeholder="${options.placeholder}"` : ""}/>`)
 			.val(UiUtil.getEntriesAsText(initialState))
 			.change(() => {
-				const raw = $ipt.val().trim();
+				const raw = $ipt.val();
 				let out = raw || !options.nullable ? UiUtil.getTextAsEntries(raw) : null;
 
 				if (out && options.fnPostProcess) {
@@ -1009,7 +1022,7 @@ class BuilderUi {
 		if (options.nullable == null) options.nullable = true;
 
 		const [$row, $rowInner] = BuilderUi.getLabelledRowTuple(name, {isMarked: true});
-		const initialState = MiscUtil.get(state, ...path) || [];
+		const initialState = this._$getStateIptStringArray_getInitialState(state, ...path);
 		const stringRows = [];
 
 		const doUpdateState = () => {
@@ -1032,6 +1045,13 @@ class BuilderUi {
 		return $row;
 	}
 
+	static _$getStateIptStringArray_getInitialState (state, ...path) {
+		const initialState = MiscUtil.get(state, ...path) || [];
+		if (initialState == null || initialState instanceof Array) return initialState;
+		// Tolerate/"migrate" single-string data, as this is a common change in data structures
+		if (typeof initialState === "string") return [initialState];
+	}
+
 	static _$getStateIptStringArray_getRow (doUpdateState, stringRows, initialString) {
 		const getState = () => $iptString.val().trim();
 
@@ -1046,7 +1066,7 @@ class BuilderUi {
 				doUpdateState();
 			});
 
-		const $wrp = $$`<div class="flex-v-center mb-2">${$iptString}${$btnRemove}</div>`;
+		const $wrp = $$`<div class="ve-flex-v-center mb-2">${$iptString}${$btnRemove}</div>`;
 		const out = {$wrp, getState};
 		stringRows.push(out);
 		return out;
@@ -1108,7 +1128,7 @@ class BuilderUi {
 				BuilderUi.__setProp(raw || !options.nullable ? raw : null, options, state, ...path);
 				fnRender();
 			});
-		return BuilderUi.__$getRow(name, $$`<div class="w-100 flex-v-center">${$ipt}</div>`, {...options, eleType: "label"});
+		return BuilderUi.__$getRow(name, $$`<div class="w-100 ve-flex-v-center">${$ipt}</div>`, {...options, eleType: "label"});
 	}
 
 	/**
@@ -1127,7 +1147,7 @@ class BuilderUi {
 		const [$row, $rowInner] = BuilderUi.getLabelledRowTuple(name, {isMarked: true});
 
 		const initialState = MiscUtil.get(state, ...path) || [];
-		const $wrpIpts = $(`<div class="flex-col w-100 mr-2"/>`).appendTo($rowInner);
+		const $wrpIpts = $(`<div class="ve-flex-col w-100 mr-2"/>`).appendTo($rowInner);
 		const inputs = [];
 		options.vals.forEach(val => {
 			const $cb = $(`<input class="mkbru__ipt-cb" type="checkbox">`)
@@ -1137,7 +1157,7 @@ class BuilderUi {
 					fnRender();
 				});
 			inputs.push({$ipt: $cb, val});
-			$$`<label class="flex-v-center split stripe-odd--faint"><span>${options.fnDisplay ? options.fnDisplay(val) : val}</span>${$cb}</label>`.appendTo($wrpIpts);
+			$$`<label class="ve-flex-v-center split stripe-odd--faint"><span>${options.fnDisplay ? options.fnDisplay(val) : val}</span>${$cb}</label>`.appendTo($wrpIpts);
 		});
 
 		const getState = () => {
@@ -1222,7 +1242,7 @@ class BuilderUi {
 			});
 
 			dragMeta.on = true;
-			dragMeta.$wrap = $(`<div class="flex-col ui-drag__wrp-drag-block"/>`).appendTo(options.$wrpRowsOuter);
+			dragMeta.$wrap = $(`<div class="ve-flex-col ui-drag__wrp-drag-block"/>`).appendTo(options.$wrpRowsOuter);
 			dragMeta.$dummies = [];
 
 			const ixRow = rows.indexOf(myRow);

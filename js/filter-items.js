@@ -16,11 +16,23 @@ class PageFilterEquipment extends PageFilter {
 			deselFn: (it) => it === "Specific Variant",
 			itemSortFn: null,
 		});
-		this._costFilter = new RangeFilter({header: "Cost", min: 0, max: 100, isAllowGreater: true, suffix: " gp"});
+		this._costFilter = new RangeFilter({
+			header: "Cost",
+			isLabelled: true,
+			isAllowGreater: true,
+			labelSortFn: null,
+			labels: [
+				0,
+				...[...new Array(9)].map((_, i) => i + 1),
+				...[...new Array(9)].map((_, i) => 10 * (i + 1)),
+				...[...new Array(100)].map((_, i) => 100 * (i + 1)),
+			],
+			labelDisplayFn: it => !it ? "None" : Parser.getDisplayCurrency(CurrencyUtil.doSimplifyCoins({cp: it})),
+		});
 		this._weightFilter = new RangeFilter({header: "Weight", min: 0, max: 100, isAllowGreater: true, suffix: " lb."});
 		this._focusFilter = new Filter({header: "Spellcasting Focus", items: [...Parser.ITEM_SPELLCASTING_FOCUS_CLASSES]});
 		this._damageTypeFilter = new Filter({header: "Weapon Damage Type", displayFn: it => Parser.dmgTypeToFull(it).uppercaseFirst(), itemSortFn: (a, b) => SortUtil.ascSortLower(Parser.dmgTypeToFull(a), Parser.dmgTypeToFull(b))});
-		this._miscFilter = new Filter({header: "Miscellaneous", items: ["Item Group", "SRD", "Has Images", "Has Info"], isSrdFilter: true});
+		this._miscFilter = new Filter({header: "Miscellaneous", items: ["Item Group", "SRD", "Basic Rules", "Has Images", "Has Info"], isMiscFilter: true});
 		this._poisonTypeFilter = new Filter({header: "Poison Type", items: ["ingested", "injury", "inhaled", "contact"], displayFn: StrUtil.toTitleCase});
 	}
 
@@ -29,8 +41,10 @@ class PageFilterEquipment extends PageFilter {
 
 		item._fProperties = item.property ? item.property.map(p => Renderer.item.propertyMap[p].name).filter(n => n) : [];
 
-		item._fMisc = item.srd ? ["SRD"] : [];
+		item._fMisc = [];
 		if (item._isItemGroup) item._fMisc.push("Item Group");
+		if (item.srd) item._fMisc.push("SRD");
+		if (item.basicRules) item._fMisc.push("Basic Rules");
 		if (item.hasFluff) item._fMisc.push("Has Info");
 		if (item.hasFluffImages) item._fMisc.push("Has Images");
 
@@ -58,7 +72,7 @@ class PageFilterEquipment extends PageFilter {
 			}
 		}
 
-		item._fValue = (item.value || 0) / 100;
+		item._fValue = item.value || 0;
 	}
 
 	addToFilters (item, isExcluded) {
@@ -193,7 +207,7 @@ class PageFilterItems extends PageFilterEquipment {
 		this._attunementFilter = new Filter({header: "Attunement", items: [...PageFilterItems._FILTER_BASE_ITEMS_ATTUNEMENT], itemSortFn: PageFilterItems._sortAttunementFilter});
 		this._bonusFilter = new Filter({header: "Bonus", items: ["Armor Class", "Proficiency Bonus", "Spell Attacks", "Spell Save DC", "Saving Throws", "Weapon Attack and Damage Rolls", "Weapon Attack Rolls", "Weapon Damage Rolls"]});
 		this._rechargeTypeFilter = new Filter({header: "Recharge Type", displayFn: Parser.itemRechargeToFull});
-		this._miscFilter = new Filter({header: "Miscellaneous", items: ["Ability Score Adjustment", "Charges", "Cursed", "Grants Proficiency", "Has Images", "Has Info", "Item Group", "Magic", "Mundane", "Sentient", "Speed Adjustment", "SRD"], isSrdFilter: true});
+		this._miscFilter = new Filter({header: "Miscellaneous", items: ["Ability Score Adjustment", "Charges", "Cursed", "Grants Proficiency", "Has Images", "Has Info", "Item Group", "Magic", "Mundane", "Sentient", "Speed Adjustment", "SRD", "Basic Rules"], isMiscFilter: true});
 		this._baseSourceFilter = new SourceFilter({header: "Base Source", selFn: null});
 		this._baseItemFilter = new Filter({header: "Base Item", displayFn: this.constructor._getBaseItemDisplay.bind(this.constructor)});
 	}
@@ -347,16 +361,16 @@ class ModalFilterItems extends ModalFilter {
 		pageFilter.mutateAndAddToFilters(item);
 
 		const eleRow = document.createElement("div");
-		eleRow.className = "px-0 w-100 flex-col no-shrink";
+		eleRow.className = "px-0 w-100 ve-flex-col no-shrink";
 
 		const hash = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_ITEMS](item);
 		const source = Parser.sourceJsonToAbv(item.source);
 		const type = item._typeListText.join(", ");
 
-		eleRow.innerHTML = `<div class="w-100 flex-vh-center lst--border no-select lst__wrp-cells">
-			<div class="col-0-5 pl-0 flex-vh-center">${this._isRadio ? `<input type="radio" name="radio" class="no-events">` : `<input type="checkbox" class="no-events">`}</div>
+		eleRow.innerHTML = `<div class="w-100 ve-flex-vh-center lst--border no-select lst__wrp-cells">
+			<div class="col-0-5 pl-0 ve-flex-vh-center">${this._isRadio ? `<input type="radio" name="radio" class="no-events">` : `<input type="checkbox" class="no-events">`}</div>
 
-			<div class="col-0-5 px-1 flex-vh-center">
+			<div class="col-0-5 px-1 ve-flex-vh-center">
 				<div class="ui-list__btn-inline px-2" title="Toggle Preview (SHIFT to Toggle Info Preview)">[+]</div>
 			</div>
 

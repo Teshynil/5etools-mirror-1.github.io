@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "magicvariants.json",
-	"version": "1.5.0",
+	"version": "1.5.2",
 	"type": "object",
 	"properties": {
 		"variant": {
@@ -68,6 +68,9 @@
 								},
 								"weaponCategory": {
 									"$ref": "shared-items.json#/definitions/itemWeaponCategory"
+								},
+								"property": {
+									"type": "string"
 								}
 							},
 							"additionalProperties": false
@@ -208,6 +211,9 @@
 							"srd": {
 								"$ref": "util.json#/definitions/srd"
 							},
+							"basicRules": {
+								"$ref": "util.json#/definitions/basicRules"
+							},
 							"otherSources": {
 								"$ref": "util.json#/definitions/otherSources"
 							},
@@ -235,7 +241,8 @@
 								"$ref": "util.json#/definitions/reqAttuneTags"
 							},
 							"hasRefs": {
-								"type": "boolean"
+								"type": "boolean",
+								"description": "Whether this item has references within its data to dedicated \"itemEntry\"s."
 							}
 						},
 						"required": [
@@ -265,7 +272,17 @@
 								"type": "integer"
 							},
 							"property": {
-								"type": "string"
+								"oneOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "array",
+										"items": {
+											"type": "string"
+										}
+									}
+								]
 							},
 							"net": {
 								"type": "boolean"

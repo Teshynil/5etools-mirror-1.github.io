@@ -1,10 +1,8 @@
 /**
  * Generator script which creates stub per-entity pages for SEO.
- * TODO: flip `IS_DEV_MODE` when developing, to avoid referencing external libraries/production files.
  */
 
 const fs = require("fs");
-const xmlbuilder = require("xmlbuilder");
 require("../js/utils");
 require("../js/render");
 require("../js/render-dice");
@@ -13,8 +11,10 @@ function rd (path) {
 	return JSON.parse(fs.readFileSync(path, "utf-8"));
 }
 
-const IS_DEV_MODE = false;
-const BASE_SITE_URL = "https://5e.tools/";
+const IS_DEV_MODE = !!process.env.VET_SEO_IS_DEV_MODE;
+const BASE_SITE_URL = process.env.VET_BASE_SITE_URL || "https://5e.tools/";
+const isSkipUaEtc = !!process.env.VET_SEO_IS_SKIP_UA_ETC;
+const isOnlyVanilla = !!process.env.VET_SEO_IS_ONLY_VANILLA;
 const version = rd("package.json").version;
 
 const lastMod = (() => {
@@ -118,6 +118,8 @@ const toGenerate = [
 		pGetEntries: () => {
 			const index = rd(`data/spells/index.json`);
 			const fileData = Object.entries(index)
+				.filter(([source]) => !isSkipUaEtc || !SourceUtil.isNonstandardSourceWotc(source))
+				.filter(([source]) => !isOnlyVanilla || Parser.SOURCES_VANILLA.has(source))
 				.map(([_, filename]) => rd(`data/spells/${filename}`));
 			return fileData.map(it => MiscUtil.copy(it.spell)).reduce((a, b) => a.concat(b));
 		},
@@ -129,6 +131,8 @@ const toGenerate = [
 		pGetEntries: () => {
 			const index = rd(`data/bestiary/index.json`);
 			const fileData = Object.entries(index)
+				.filter(([source]) => !isSkipUaEtc || !SourceUtil.isNonstandardSourceWotc(source))
+				.filter(([source]) => !isOnlyVanilla || Parser.SOURCES_VANILLA.has(source))
 				.map(([source, filename]) => ({source: source, json: rd(`data/bestiary/${filename}`)}));
 			// Filter to prevent duplicates from "otherSources" copies
 			return fileData.map(it => MiscUtil.copy(it.json.monster.filter(mon => mon.source === it.source))).reduce((a, b) => a.concat(b));
@@ -139,7 +143,10 @@ const toGenerate = [
 	{
 		page: "items",
 		pGetEntries: async () => {
-			return Renderer.item.pBuildList();
+			const out = await Renderer.item.pBuildList();
+			return out
+				.filter(it => !isSkipUaEtc || !SourceUtil.isNonstandardSourceWotc(it.source))
+				.filter(it => !isOnlyVanilla || Parser.SOURCES_VANILLA.has(it.source));
 		},
 		style: 1,
 		isFluff: 1,
@@ -192,34 +199,37 @@ async function main () {
 	console.log(`Wrote ${total} files.`);
 
 	let sitemapLinkCount = 0;
-	const $urlSet = xmlbuilder
-		.create("urlset", {version: "1.0", encoding: "UTF-8"})
-		.att("xmlns", "https://www.sitemaps.org/schemas/sitemap/0.9");
+	let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+	sitemap += `<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
-	const $urlRoot = $urlSet.ele("url");
-	$urlRoot.ele("loc", BASE_SITE_URL);
-	$urlRoot.ele("lastmod", lastMod);
-	$urlRoot.ele("changefreq", "monthly");
+	sitemap += `<url>
+	<loc>${BASE_SITE_URL}</loc>
+	<lastmod>${lastMod}</lastmod>
+	<changefreq>monthly</changefreq>
+</url>\n`;
 	sitemapLinkCount++;
 
 	Object.keys(baseSitemapData).forEach(url => {
-		const $url = $urlSet.ele("url");
-		$url.ele("loc", `${BASE_SITE_URL}${url}`);
-		$url.ele("lastmod", lastMod);
-		$url.ele("changefreq", "monthly");
+		sitemap += `<url>
+	<loc>${BASE_SITE_URL}${url}</loc>
+	<lastmod>${lastMod}</lastmod>
+	<changefreq>monthly</changefreq>
+</url>\n`;
 		sitemapLinkCount++;
 	});
 
 	Object.keys(siteMapData).forEach(url => {
-		const $url = $urlSet.ele("url");
-		$url.ele("loc", `${BASE_SITE_URL}${url}`);
-		$url.ele("lastmod", lastMod);
-		$url.ele("changefreq", "weekly");
+		sitemap += `<url>
+	<loc>${BASE_SITE_URL}${url}</loc>
+	<lastmod>${lastMod}</lastmod>
+	<changefreq>weekly</changefreq>
+</url>\n`;
 		sitemapLinkCount++;
 	});
 
-	const xml = $urlSet.end({pretty: true});
-	fs.writeFileSync("./sitemap.xml", xml, "utf-8");
+	sitemap += `</urlset>\n`;
+
+	fs.writeFileSync("./sitemap.xml", sitemap, "utf-8");
 	console.log(`Wrote ${sitemapLinkCount.toLocaleString()} URL${sitemapLinkCount === 1 ? "" : "s"} to sitemap.xml`);
 }
 

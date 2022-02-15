@@ -113,7 +113,10 @@ PropOrder._MONSTER = [
 	"page",
 
 	"srd",
+	"basicRules",
+	"additionalSources",
 	"otherSources",
+	"reprintedAs",
 
 	"summonedBySpell",
 	"summonedByClass",
@@ -234,7 +237,8 @@ PropOrder._SPELL = [
 	"source",
 	"page",
 	"srd",
-
+	"basicRules",
+	"additionalSources",
 	"otherSources",
 
 	"level",
@@ -263,6 +267,8 @@ PropOrder._SPELL = [
 	"savingThrow",
 	"abilityCheck",
 
+	"affectsCreatureType",
+
 	"miscTags",
 	"areaTags",
 
@@ -280,6 +286,7 @@ PropOrder._ACTION = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"fromVariant",
 
@@ -326,7 +333,7 @@ PropOrder._BACKGROUND = [
 	"source",
 	"page",
 	"srd",
-
+	"basicRules",
 	"additionalSources",
 	"otherSources",
 
@@ -342,12 +349,16 @@ PropOrder._BACKGROUND = [
 		],
 	}),
 
+	"feats",
+
 	"skillProficiencies",
 	"languageProficiencies",
 	"toolProficiencies",
 	"startingEquipment",
 
 	"additionalSpells",
+
+	"fromFeature",
 
 	"entries",
 
@@ -418,7 +429,7 @@ PropOrder._CLASS = [
 	"page",
 	"srd",
 	"isReprinted",
-
+	"basicRules",
 	"otherSources",
 
 	"isSidekick",
@@ -464,7 +475,7 @@ PropOrder._SUBCLASS = [
 	"page",
 	"srd",
 	"isReprinted",
-
+	"basicRules",
 	"otherSources",
 
 	new PropOrder._ObjectKey("_copy", {
@@ -489,6 +500,8 @@ PropOrder._SUBCLASS = [
 
 	"additionalSpells",
 
+	"optionalfeatureProgression",
+
 	"subclassTableGroups",
 	"subclassFeatures",
 ];
@@ -503,7 +516,7 @@ PropOrder._CLASS_FEATURE = [
 	"source",
 	"page",
 	"srd",
-
+	"basicRules",
 	"otherSources",
 
 	"className",
@@ -514,6 +527,9 @@ PropOrder._CLASS_FEATURE = [
 
 	"header",
 	"type",
+
+	"consumes",
+
 	"entries",
 ];
 PropOrder._SUBCLASS_FEATURE = [
@@ -522,7 +538,7 @@ PropOrder._SUBCLASS_FEATURE = [
 	"source",
 	"page",
 	"srd",
-
+	"basicRules",
 	"otherSources",
 
 	"className",
@@ -537,6 +553,9 @@ PropOrder._SUBCLASS_FEATURE = [
 
 	"header",
 	"type",
+
+	"consumes",
+
 	"entries",
 ];
 PropOrder._LANGUAGE = [
@@ -546,7 +565,7 @@ PropOrder._LANGUAGE = [
 	"source",
 	"page",
 	"srd",
-
+	"basicRules",
 	"additionalSources",
 
 	"type",
@@ -570,6 +589,7 @@ PropOrder._CONDITION = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"entries",
 
@@ -582,6 +602,7 @@ PropOrder._DISEASE = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"entries",
 ];
@@ -591,6 +612,7 @@ PropOrder._STATUS = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"entries",
 ];
@@ -600,6 +622,10 @@ PropOrder._CULT = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
+	"additionalSources",
+	"otherSources",
+	"reprintedAs",
 
 	"type",
 
@@ -615,6 +641,10 @@ PropOrder._BOON = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
+	"additionalSources",
+	"otherSources",
+	"reprintedAs",
 
 	"type",
 
@@ -634,6 +664,7 @@ PropOrder._DEITY = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"additionalSources",
 
@@ -676,6 +707,7 @@ PropOrder._FEAT = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"additionalSources",
 	"otherSources",
@@ -683,7 +715,6 @@ PropOrder._FEAT = [
 	"prerequisite",
 	"ability",
 
-	new PropOrder._ArrayKey("proficiencyTags", {fnSort: SortUtil.ascSortLower}),
 	"skillProficiencies",
 	"languageProficiencies",
 	"toolProficiencies",
@@ -701,6 +732,7 @@ PropOrder._VEHICLE = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"vehicleType",
 
@@ -757,6 +789,7 @@ PropOrder._VEHICLE_UPGRADE = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 	"otherSources",
 
 	"upgradeType",
@@ -784,6 +817,7 @@ PropOrder._ITEM = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"additionalSources",
 	"otherSources",
@@ -919,6 +953,8 @@ PropOrder._ITEM = [
 	"spellScrollLevel",
 	"lootTables",
 
+	"seeAlsoVehicle",
+
 	"hasFluff",
 	"hasFluffImages",
 ];
@@ -955,6 +991,7 @@ PropOrder._OBJECT = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"size",
 	"objectType",
@@ -990,6 +1027,7 @@ PropOrder._OPTIONALFEATURE = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 	"otherSources",
 
 	"isClassFeatureVariant",
@@ -1006,6 +1044,8 @@ PropOrder._OPTIONALFEATURE = [
 	"armorProficiencies",
 
 	"additionalSpells",
+
+	"consumes",
 
 	"entries",
 ];
@@ -1041,7 +1081,7 @@ PropOrder._VARIANTRULE = [
 	"source",
 	"page",
 	"srd",
-
+	"basicRules",
 	"additionalSources",
 
 	"ruleType",
@@ -1049,16 +1089,13 @@ PropOrder._VARIANTRULE = [
 	"type",
 	"entries",
 ];
-PropOrder._RACE = [
-	"name",
-	"alias",
-
-	"source",
+PropOrder._RACE_SUBRACE = [
 	"page",
 	"srd",
-
+	"basicRules",
 	"additionalSources",
 	"otherSources",
+	"reprintedAs",
 
 	new PropOrder._ObjectKey("_copy", {
 		order: [
@@ -1073,8 +1110,9 @@ PropOrder._RACE = [
 
 	"lineage",
 	"creatureTypes",
+	"creatureTypeTags",
 
-	"size",
+	new PropOrder._ArrayKey("size", {fnSort: SortUtil.ascSortSize}),
 	"speed",
 	"ability",
 
@@ -1103,11 +1141,6 @@ PropOrder._RACE = [
 
 	"entries",
 
-	new PropOrder._ArrayKey("subraces", {
-		fnGetOrder: () => PropOrder._RACE,
-		fnSort: (a, b) => SortUtil.ascSortLower(a.name || "", b.name || "") || SortUtil.ascSortLower(a.source || "", b.source || ""),
-	}),
-
 	"overwrite",
 
 	"hasFluff",
@@ -1127,10 +1160,29 @@ PropOrder._RACE = [
 		fnSort: (a, b) => SortUtil.ascSortLower(a.name || "", b.name || "") || SortUtil.ascSortLower(a.source || "", b.source || ""),
 	}),
 ];
+PropOrder._RACE = [
+	"name",
+	"alias",
+
+	"source",
+
+	...PropOrder._RACE_SUBRACE,
+];
 PropOrder._RACE__COPY_MOD = [
 	"*",
 	"_",
 	...PropOrder._RACE,
+];
+PropOrder._SUBRACE = [
+	"name",
+	"alias",
+
+	"source",
+
+	"raceName",
+	"raceSource",
+
+	...PropOrder._RACE_SUBRACE,
 ];
 PropOrder._TABLE = [
 	"name",
@@ -1153,6 +1205,7 @@ PropOrder._TRAP = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
 
 	"trapHazType",
 
@@ -1179,6 +1232,10 @@ PropOrder._HAZARD = [
 	"source",
 	"page",
 	"srd",
+	"basicRules",
+	"additionalSources",
+	"otherSources",
+	"reprintedAs",
 
 	"trapHazType",
 
@@ -1199,6 +1256,7 @@ PropOrder._RECIPE = [
 	"makes",
 	"serves",
 	"ingredients",
+	"equipment",
 	"instructions",
 	"noteCook",
 
@@ -1265,6 +1323,7 @@ PropOrder._PROP_TO_LIST = {
 	"variantrule": PropOrder._VARIANTRULE,
 	"spellFluff": PropOrder._GENERIC_FLUFF,
 	"race": PropOrder._RACE,
+	"subrace": PropOrder._SUBRACE,
 	"table": PropOrder._TABLE,
 	"trap": PropOrder._TRAP,
 	"hazard": PropOrder._HAZARD,

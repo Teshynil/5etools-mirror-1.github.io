@@ -267,6 +267,9 @@
 			"conditionInflict": [
 				"charmed"
 			],
+			"affectsCreatureType": [
+				"beast"
+			],
 			"miscTags": [
 				"SGT"
 			],
@@ -565,6 +568,20 @@
 			"savingThrow": [
 				"wisdom"
 			],
+			"affectsCreatureType": [
+				"aberration",
+				"beast",
+				"celestial",
+				"dragon",
+				"elemental",
+				"fey",
+				"fiend",
+				"giant",
+				"humanoid",
+				"monstrosity",
+				"ooze",
+				"plant"
+			],
 			"miscTags": [
 				"SGT"
 			],
@@ -676,6 +693,9 @@
 					]
 				}
 			],
+			"affectsCreatureType": [
+				"humanoid"
+			],
 			"miscTags": [
 				"MAC"
 			],
@@ -745,8 +765,8 @@
 						"Damage Type"
 					],
 					"colStyles": [
-						"col-1 text-center",
-						"col-11"
+						"col-2 text-center",
+						"col-10"
 					],
 					"rows": [
 						[
@@ -847,6 +867,9 @@
 			],
 			"spellAttack": [
 				"R"
+			],
+			"miscTags": [
+				"RO"
 			],
 			"areaTags": [
 				"ST"
@@ -1316,6 +1339,9 @@
 			"spellAttack": [
 				"R"
 			],
+			"miscTags": [
+				"LGT"
+			],
 			"areaTags": [
 				"ST"
 			],
@@ -1448,6 +1474,9 @@
 			],
 			"savingThrow": [
 				"constitution"
+			],
+			"miscTags": [
+				"LGTS"
 			],
 			"areaTags": [
 				"Y"
@@ -2243,13 +2272,13 @@
 		{
 			"name": "Find Greater Steed",
 			"source": "XGE",
+			"page": 156,
 			"additionalSources": [
 				{
 					"source": "FTD",
 					"page": 190
 				}
 			],
-			"page": 156,
 			"level": 4,
 			"school": "C",
 			"time": [
@@ -2286,7 +2315,7 @@
 					"page": 190,
 					"name": "Dragonnel Steeds",
 					"entries": [
-						"With the DM's permission, a paladin can summon a spirit in the form of a dragonnel using the find greater steed spell, which appears in {@i Xanathar's Guide to Everything}."
+						"With the DM's permission, a paladin can summon a spirit in the form of a {@creature dragonnel|ftd} using the find greater steed spell, which appears in {@i Xanathar's Guide to Everything}."
 					]
 				}
 			],
@@ -2702,6 +2731,20 @@
 					]
 				}
 			],
+			"affectsCreatureType": [
+				"aberration",
+				"beast",
+				"celestial",
+				"dragon",
+				"elemental",
+				"fey",
+				"fiend",
+				"giant",
+				"humanoid",
+				"monstrosity",
+				"ooze",
+				"plant"
+			],
 			"miscTags": [
 				"HL",
 				"SGT"
@@ -2768,6 +2811,7 @@
 				"constitution"
 			],
 			"miscTags": [
+				"LGT",
 				"SGT"
 			],
 			"areaTags": [
@@ -2982,6 +3026,7 @@
 				"dexterity"
 			],
 			"miscTags": [
+				"LGT",
 				"SGT"
 			],
 			"areaTags": [
@@ -3214,6 +3259,9 @@
 			],
 			"savingThrow": [
 				"dexterity"
+			],
+			"miscTags": [
+				"LGT"
 			],
 			"areaTags": [
 				"L"
@@ -5447,6 +5495,9 @@
 				},
 				"A creature that can see the sensor (such as one using {@spell see invisibility} or {@sense truesight}) sees a translucent image of the tormented humanoid whose soul you caged."
 			],
+			"affectsCreatureType": [
+				"humanoid"
+			],
 			"miscTags": [
 				"HL"
 			],
@@ -5773,6 +5824,7 @@
 				}
 			],
 			"miscTags": [
+				"RO",
 				"SGT",
 				"SMN"
 			],
@@ -5900,6 +5952,13 @@
 			],
 			"savingThrow": [
 				"charisma"
+			],
+			"affectsCreatureType": [
+				"celestial",
+				"elemental",
+				"fey",
+				"fiend",
+				"undead"
 			],
 			"miscTags": [
 				"HL",

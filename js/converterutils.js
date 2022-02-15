@@ -34,6 +34,7 @@ class BaseParser {
 			.replace(/\n\r/g, "\n")
 			.replace(/\r\n/g, "\n")
 			.replace(/\r/g, "\n")
+			.replace(/­\s*\n\s*/g, "")
 			.replace(/[−–‒]/g, "-") // convert minus signs to hyphens
 		;
 
@@ -65,6 +66,7 @@ class BaseParser {
 	 * @param [opts.noHit] Disable "Hit:" checking.
 	 * @param [opts.noSpellcastingAbility] Disable spellcasting ability checking.
 	 * @param [opts.noSpellcastingWarlockSlotLevel] Disable spellcasting warlock slot checking.
+	 * @param [opts.noDc] Disable "DC" checking
 	 */
 	static _isContinuationLine (entryArray, curLine, opts) {
 		opts = opts || {};
@@ -82,12 +84,14 @@ class BaseParser {
 
 		if (/^\d..-\d.. level\s+\(/.test(cleanLine) && !opts.noSpellcastingWarlockSlotLevel) return false;
 
+		if (/^•/.test(cleanLine)) return false;
+
 		// A lowercase word
 		if (/^[a-z]/.test(cleanLine) && !opts.noLowercase) return true;
 		// An ordinal (e.g. "3rd"), but not a spell level (e.g. "1st level")
 		if (/^\d[a-z][a-z]/.test(cleanLine) && !/^\d[a-z][a-z] level/gi.test(cleanLine)) return true;
-		// A number (e.g. damage; "5 (1d6 + 2)")
-		if (/^\d+\s+/.test(cleanLine) && !opts.noNumber) return true;
+		// A number (e.g. damage; "5 (1d6 + 2)"), optionally with slash-separated parts (e.g. "30/120 ft.")
+		if (/^\d+(\/\d+)*\s+/.test(cleanLine) && !opts.noNumber) return true;
 		// Opening brackets (e.g. damage; "(1d6 + 2)")
 		if (/^\(/.test(cleanLine) && !opts.noParenthesis) return true;
 		// An ability score name followed by "saving throw"
@@ -97,6 +101,7 @@ class BaseParser {
 		// "Hit:" e.g. inside creature attacks
 		if (/^Hit:/.test(cleanLine) && !opts.noHit) return true;
 		if (/^(Intelligence|Wisdom|Charisma)\s+\(/.test(cleanLine) && !opts.noSpellcastingAbility) return true;
+		if (/^DC\s+/.test(cleanLine) && !opts.noDc) return true;
 
 		return false;
 	}
@@ -422,7 +427,22 @@ class DiceConvert {
 					"dmg2",
 				]),
 			});
-			DiceConvert._walkerHandlers = {string: DiceConvert._walkerStringHandler.bind(DiceConvert, isTagHits)};
+			DiceConvert._walkerHandlers = {
+				string: (str) => {
+					const ptrStack = {_: ""};
+					TaggerUtils.walkerStringHandler(
+						["@dice", "@hit", "@damage", "@scaledice", "@scaledamage", "@d20"],
+						ptrStack,
+						0,
+						0,
+						str,
+						{
+							fnTag: this._walkerStringHandler.bind(this, isTagHits),
+						},
+					);
+					return ptrStack._;
+				},
+			};
 		}
 		entry = MiscUtil.copy(entry);
 		return DiceConvert._walker.walk(entry, DiceConvert._walkerHandlers);
@@ -431,14 +451,13 @@ class DiceConvert {
 	static _walkerStringHandler (isTagHits, str) {
 		if (isTagHits) {
 			// replace e.g. "+X to hit"
-			str = str.replace(/([-+])?\d+(?= to hit)/g, function (match) {
-				const cleanMatch = match.startsWith("+") ? match.replace("+", "") : match;
-				return `{@hit ${cleanMatch}}`;
+			str = str.replace(/(?<op>[-+])?(?<bonus>\d+)(?= to hit)\b/g, (...m) => {
+				return `{@hit ${m.last().op === "-" ? "-" : ""}${m.last().bonus}}`;
 			});
 		}
 
 		// re-tag + format dice
-		str = str.replace(/(\s*[-+]\s*)?(([1-9]\d*)?d([1-9]\d*)(\s*?[-+×x*÷/]\s*?(\d,\d|\d)+(\.\d+)?)?)+(?:\s*\+\s*\bPB\b)?/gi, (...m) => {
+		str = str.replace(/\b(\s*[-+]\s*)?(([1-9]\d*)?d([1-9]\d*)(\s*?[-+×x*÷/]\s*?(\d,\d|\d)+(\.\d+)?)?)+(?:\s*\+\s*\bPB\b)?\b/gi, (...m) => {
 			const expanded = m[0].replace(/([^0-9d.,PB])/gi, " $1 ").replace(/\s+/g, " ");
 			return `{@dice ${expanded}}`;
 		});
@@ -775,13 +794,18 @@ class ConvertUtil {
 	 * (Inline titles)
 	 * Checks if a line of text starts with a name, e.g.
 	 * "Big Attack. Lorem ipsum..." vs "Lorem ipsum..."
+	 * @param line
+	 * @param exceptions A set of (lowercase) exceptions which should always be treated as "not a name" (e.g. "cantrips")
+	 * @param splitterPunc Regexp to use when splitting by punctuation.
+	 * @returns {boolean}
 	 */
-	static isNameLine (line) {
-		const spl = line.split(/[.!?]/);
+	static isNameLine (line, {exceptions = null, splitterPunc = null} = {}) {
+		const spl = this._getMergedSplitName({line, splitterPunc});
 		if (spl.map(it => it.trim()).filter(Boolean).length === 1) return false;
 
 		// ignore everything inside parentheses
 		const namePart = ConvertUtil.getWithoutParens(spl[0]);
+		if (!namePart) return false; // (If this is _everything_ cancel)
 
 		const reStopwords = new RegExp(`^(${StrUtil.TITLE_LOWER_WORDS.join("|")})$`, "i");
 		const tokens = namePart.split(/([ ,;:]+)/g);
@@ -791,10 +815,12 @@ class ConvertUtil {
 			return !isStopword;
 		});
 
-		const namePartNoStopwords = cleanTokens.join("");
+		const namePartNoStopwords = cleanTokens.join("").trim();
 
 		// if it's an ability score, it's not a name
-		if (Object.values(Parser.ATB_ABV_TO_FULL).includes(namePartNoStopwords.trim())) return false;
+		if (Object.values(Parser.ATB_ABV_TO_FULL).includes(namePartNoStopwords)) return false;
+
+		if (exceptions && exceptions.has(namePartNoStopwords.toLowerCase())) return false;
 
 		// if it's in title case after removing all stopwords, it's a name
 		return namePartNoStopwords.toTitleCase() === namePartNoStopwords;
@@ -809,7 +835,17 @@ class ConvertUtil {
 	static isListItemLine (line) { return line.trim().startsWith("•"); }
 
 	static splitNameLine (line, isKeepPunctuation) {
-		let spl = line.split(/([.!?:])/g);
+		const spl = this._getMergedSplitName({line});
+		const rawName = spl[0];
+		const entry = line.substring(rawName.length + 1, line.length).trim();
+		const name = this.getCleanTraitActionName(rawName);
+		const out = {name, entry};
+		if (isKeepPunctuation) out.name += spl[1].trim();
+		return out;
+	}
+
+	static _getMergedSplitName ({line, splitterPunc}) {
+		let spl = line.split(splitterPunc || /([.!?:])/g);
 
 		// Handle e.g. "1. Freezing Ray. ..."
 		if (/^\d+$/.test(spl[0]) && spl.length > 3) {
@@ -819,12 +855,15 @@ class ConvertUtil {
 			];
 		}
 
-		const rawName = spl[0];
-		const entry = line.substring(rawName.length + 1, line.length).trim();
-		const name = this.getCleanTraitActionName(rawName);
-		const out = {name, entry};
-		if (isKeepPunctuation) out.name += spl[1].trim();
-		return out;
+		// Handle e.g. "Mr. Blue" or "If Mr. Blue"
+		for (let i = 0; i < spl.length - 2; ++i) {
+			const toCheck = `${spl[i]}${spl[i + 1]}`;
+			if (!toCheck.split(" ").some(it => ConvertUtil._CONTRACTIONS.has(it))) continue;
+			spl[i] = `${spl[i]}${spl[i + 1]}${spl[i + 2]}`;
+			spl.splice(i + 1, 2);
+		}
+
+		return spl;
 	}
 
 	static getCleanTraitActionName (name) {
@@ -896,6 +935,7 @@ class ConvertUtil {
 		return new RegExp(`\\s*${start.escapeRegexp()}\\s*?(?::|\\.|\\b)\\s*`, "i");
 	}
 }
+ConvertUtil._CONTRACTIONS = new Set(["Mr.", "Mrs.", "Ms.", "Dr."]);
 
 class AlignmentUtil {
 

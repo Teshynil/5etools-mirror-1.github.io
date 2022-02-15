@@ -10,18 +10,19 @@ class PageFilterConditionsDiseases extends PageFilter {
 	constructor () {
 		super();
 
-		this._sourceFilter = new SourceFilter();
 		this._typeFilter = new Filter({
 			header: "Type",
 			items: ["condition", "disease", "status"],
 			displayFn: PageFilterConditionsDiseases.getDisplayProp,
 			deselFn: (it) => it === "disease" || it === "status",
 		});
-		this._miscFilter = new Filter({header: "Miscellaneous", items: ["SRD", "Has Images", "Has Info"], isSrdFilter: true});
+		this._miscFilter = new Filter({header: "Miscellaneous", items: ["SRD", "Basic Rules", "Has Images", "Has Info"], isMiscFilter: true});
 	}
 
 	static mutateForFilters (it) {
-		it._fMisc = it.srd ? ["SRD"] : [];
+		it._fMisc = [];
+		if (it.srd) it._fMisc.push("SRD");
+		if (it.basicRules) it._fMisc.push("Basic Rules");
 		if (it.hasFluff) it._fMisc.push("Has Info");
 		if (it.hasFluffImages) it._fMisc.push("Has Images");
 	}

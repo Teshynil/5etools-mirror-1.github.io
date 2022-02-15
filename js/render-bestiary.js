@@ -24,9 +24,9 @@ class RenderBestiary {
 	}
 
 	static _getPronunciationButton (mon) {
-		return `<button class="btn btn-xs btn-default btn-name-pronounce ml-2 mb-2 self-flex-end">
+		return `<button class="btn btn-xs btn-default btn-name-pronounce ml-2 mb-2 ve-self-flex-end">
 			<span class="glyphicon glyphicon-volume-up name-pronounce-icon"></span>
-			<audio class="name-pronounce">
+			<audio class="name-pronounce" preload="none">
 			   <source src="${Renderer.utils.getMediaUrl(mon, "soundClip", "audio")}" type="audio/mpeg">
 			</audio>
 		</button>`;
@@ -143,6 +143,7 @@ class RenderBestiary {
 			otherSources: mon.otherSources,
 			additionalSources: mon.additionalSources,
 			externalSources: mon.externalSources,
+			reprintedAs: mon.reprintedAs,
 		};
 		const additional = mon.additionalSources ? MiscUtil.copy(mon.additionalSources) : [];
 		if (mon.variant?.length) {
@@ -160,9 +161,9 @@ class RenderBestiary {
 		}
 		srcCpy.additionalSources = additional;
 
-		const pageTrInner = Renderer.utils.getSourceAndPageTrHtml(srcCpy);
+		const pageTrInner = Renderer.utils.getSourceAndPageTrHtml(srcCpy, {tag: "creature", fnUnpackUid: (uid) => DataUtil.generic.unpackUid(uid, "creature")});
 		if (!mon.environment?.length) return [pageTrInner];
-		return [pageTrInner, `<div class="mb-1 mt-2"><b>Environment:</b> ${mon.environment.sort(SortUtil.ascSortLower).map(it => it.toTitleCase()).join(", ")}</div>`];
+		return [pageTrInner, `<div class="mb-1 mt-2"><b>Environment:</b> ${Renderer.monster.getRenderedEnvironment(mon.environment)}</div>`];
 	}
 
 	static $getRenderedLegendaryGroup (legGroup) {

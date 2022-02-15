@@ -35,6 +35,8 @@ class PageFilter {
 		return this._filterBox;
 	}
 
+	trimState () { return this._filterBox.trimState_(); }
+
 	// region Helpers
 	static _getClassFilterItem ({className, classSource, isVariantClass, definedInSource}) {
 		const nm = className.split("(")[0].trim();
@@ -105,6 +107,8 @@ class ModalFilter {
 
 	get pageFilter () { return this._pageFilter; }
 
+	get allData () { return this._allData; }
+
 	_$getWrpList () { return $(`<div class="list ui-list__wrp overflow-x-hidden overflow-y-auto h-100 min-h-0"></div>`); }
 
 	_$getColumnHeaderPreviewAll (opts) {
@@ -126,29 +130,29 @@ class ModalFilter {
 
 		await this._pInit();
 
-		const $ovlLoading = $(`<div class="w-100 h-100 flex-vh-center"><i class="dnd-font ve-muted">Loading...</i></div>`).appendTo($wrp);
+		const $ovlLoading = $(`<div class="w-100 h-100 ve-flex-vh-center"><i class="dnd-font ve-muted">Loading...</i></div>`).appendTo($wrp);
 
 		const $iptSearch = (opts.$iptSearch || $(`<input class="form-control lst__search lst__search--no-border-h h-100" type="search" placeholder="Search...">`)).disableSpellcheck();
 		const $btnReset = opts.$btnReset || $(`<button class="btn btn-default">Reset</button>`);
-		const $dispNumVisible = $(`<div class="lst__wrp-search-visible no-events flex-vh-center"></div>`);
+		const $dispNumVisible = $(`<div class="lst__wrp-search-visible no-events ve-flex-vh-center"></div>`);
 
 		const $wrpIptSearch = $$`<div class="w-100 relative">
 			${$iptSearch}
-			<div class="lst__wrp-search-glass no-events flex-vh-center"><span class="glyphicon glyphicon-search"></span></div>
+			<div class="lst__wrp-search-glass no-events ve-flex-vh-center"><span class="glyphicon glyphicon-search"></span></div>
 			${$dispNumVisible}
 		</div>`;
 
-		const $wrpFormTop = $$`<div class="flex input-group btn-group w-100 lst__form-top">${$wrpIptSearch}${$btnReset}</div>`;
+		const $wrpFormTop = $$`<div class="ve-flex input-group btn-group w-100 lst__form-top">${$wrpIptSearch}${$btnReset}</div>`;
 
 		const $wrpFormBottom = opts.$wrpMiniPills || $(`<div class="w-100"></div>`);
 
-		const $wrpFormHeaders = $(`<div class="input-group input-group--bottom flex no-shrink"></div>`);
+		const $wrpFormHeaders = $(`<div class="input-group input-group--bottom ve-flex no-shrink"></div>`);
 		const $cbSelAll = opts.isBuildUi || this._isRadio ? null : $(`<input type="checkbox">`);
 		const $btnSendAllToRight = opts.isBuildUi ? $(`<button class="btn btn-xxs btn-default col-1" title="Add All"><span class="glyphicon glyphicon-arrow-right"></span></button>`) : null;
 
 		if (!opts.isBuildUi) {
-			if (this._isRadio) $wrpFormHeaders.append(`<label class="btn btn-default btn-xs col-0-5 flex-vh-center" disabled></label>`);
-			else $$`<label class="btn btn-default btn-xs col-0-5 flex-vh-center">${$cbSelAll}</label>`.appendTo($wrpFormHeaders);
+			if (this._isRadio) $wrpFormHeaders.append(`<label class="btn btn-default btn-xs col-0-5 ve-flex-vh-center" disabled></label>`);
+			else $$`<label class="btn btn-default btn-xs col-0-5 ve-flex-vh-center">${$cbSelAll}</label>`.appendTo($wrpFormHeaders);
 		}
 
 		const $btnTogglePreviewAll = this._$getColumnHeaderPreviewAll(opts)
@@ -157,7 +161,7 @@ class ModalFilter {
 		this._$getColumnHeaders().forEach($ele => $wrpFormHeaders.append($ele));
 		if (opts.isBuildUi) $btnSendAllToRight.appendTo($wrpFormHeaders);
 
-		const $wrpForm = $$`<div class="flex-col w-100 mb-1">${$wrpFormTop}${$wrpFormBottom}${$wrpFormHeaders}</div>`;
+		const $wrpForm = $$`<div class="ve-flex-col w-100 mb-1">${$wrpFormTop}${$wrpFormBottom}${$wrpFormHeaders}</div>`;
 		const $wrpList = this._$getWrpList();
 
 		const $btnConfirm = opts.isBuildUi ? null : $(`<button class="btn btn-default">Confirm</button>`);
@@ -205,16 +209,18 @@ class ModalFilter {
 			});
 		};
 
+		this._pageFilter.trimState();
+
 		this._pageFilter.filterBox.on(FilterBox.EVNT_VALCHANGE, handleFilterChange);
 		this._pageFilter.filterBox.render();
 		handleFilterChange();
 
 		$ovlLoading.remove();
 
-		const $wrpInner = $$`<div class="flex-col h-100">
+		const $wrpInner = $$`<div class="ve-flex-col h-100">
 			${$wrpForm}
 			${$wrpList}
-			${opts.isBuildUi ? null : $$`<hr class="hr-1"><div class="flex-vh-center">${$btnConfirm}</div>`}
+			${opts.isBuildUi ? null : $$`<hr class="hr-1"><div class="ve-flex-vh-center">${$btnConfirm}</div>`}
 		</div>`.appendTo($wrp.empty());
 
 		return {
@@ -394,9 +400,12 @@ class FilterBox extends ProxyBase {
 		return this;
 	}
 
-	off (identifier) {
+	off (identifier, fn = null) {
 		const [eventName, namespace] = identifier.split(".");
-		this._eventListeners[eventName] = (this._eventListeners[eventName] || []).filter(it => it.namespace !== namespace);
+		this._eventListeners[eventName] = (this._eventListeners[eventName] || []).filter(it => {
+			if (fn != null) return it.namespace !== namespace || it.fn !== fn;
+			return it.namespace !== namespace;
+		});
 		if (!this._eventListeners[eventName].length) delete this._eventListeners[eventName];
 		return this;
 	}
@@ -469,6 +478,10 @@ class FilterBox extends ProxyBase {
 
 	async _pDoSaveState () {
 		await StorageUtil.pSetForPage(this._getNamespacedStorageKey(), this._getSaveableState());
+	}
+
+	trimState_ () {
+		this._filters.forEach(f => f.trimState_());
 	}
 
 	render () {
@@ -592,17 +605,17 @@ class FilterBox extends ProxyBase {
 		const $btnCancel = $(`<button class="btn btn-default fltr__btn-close">Cancel</button>`)
 			.click(() => this._modalMeta.doClose(false));
 
-		$$(this._modalMeta.$modal)`<div class="split mb-2 mt-2 flex-v-center mobile__flex-col">
-			<div class="flex-v-baseline mobile__flex-col">
+		$$(this._modalMeta.$modal)`<div class="split mb-2 mt-2 ve-flex-v-center mobile__ve-flex-col">
+			<div class="ve-flex-v-baseline mobile__ve-flex-col">
 				<h4 class="m-0 mr-2 mobile__mb-2">Filters</h4>
 				${metaIptSearch.$wrp.addClass("mobile__mb-2")}
 			</div>
-			<div class="flex-v-center mobile__flex-col">
-				<div class="flex-v-center mobile__m-1">
+			<div class="ve-flex-v-center mobile__ve-flex-col">
+				<div class="ve-flex-v-center mobile__m-1">
 					<div class="mr-2">Combine as</div>
 					${$wrpBtnCombineFilters}
 				</div>
-				<div class="flex-v-center mobile__m-1">
+				<div class="ve-flex-v-center mobile__m-1">
 					<div class="btn-group mr-2">
 						${$btnShowAllFilters}
 						${$btnHideAllFilters}
@@ -620,7 +633,7 @@ class FilterBox extends ProxyBase {
 			${$children}
 		</div>
 		<hr class="my-1 w-100">
-		<div class="w-100 flex-vh-center my-1">${$btnSave}${$btnCancel}</div>`;
+		<div class="w-100 ve-flex-vh-center my-1">${$btnSave}${$btnCancel}</div>`;
 	}
 
 	_openSettingsModal () {
@@ -771,37 +784,37 @@ class FilterBox extends ProxyBase {
 				} else if (FilterUtil.SUB_HASH_PREFIXES.has(prefix)) throw new Error(`Could not find filter with header ${urlHeader} for subhash ${data.raw}`);
 			});
 
-		if (consumed.size || force) {
-			this._setFromSubHashState(urlHeaderToFilter, filterBoxState);
+		if (!consumed.size && !force) return subHashes;
 
-			Object.entries(statePerFilter).forEach(([urlHeader, state]) => {
-				const filter = urlHeaderToFilter[urlHeader];
-				filter.setFromSubHashState(state);
+		this._setFromSubHashState(urlHeaderToFilter, filterBoxState);
+
+		Object.entries(statePerFilter).forEach(([urlHeader, state]) => {
+			const filter = urlHeaderToFilter[urlHeader];
+			filter.setFromSubHashState(state);
+		});
+
+		// reset any other state/meta state/etc
+		Object.keys(urlHeaderToFilter)
+			.filter(k => !updatedUrlHeaders.has(k))
+			.forEach(k => {
+				const filter = urlHeaderToFilter[k];
+				filter.resetShallow(true);
 			});
 
-			// reset any other state/meta state/etc
-			Object.keys(urlHeaderToFilter)
-				.filter(k => !updatedUrlHeaders.has(k))
-				.forEach(k => {
-					const filter = urlHeaderToFilter[k];
-					filter.resetShallow(true);
-				});
+		const [link] = Hist.getHashParts();
 
-			const [link] = Hist.getHashParts();
+		const outSub = [];
+		Object.values(unpacked)
+			.filter(v => !consumed.has(v.raw))
+			.forEach(v => outSub.push(v.raw));
 
-			const outSub = [];
-			Object.values(unpacked)
-				.filter(v => !consumed.has(v.raw))
-				.forEach(v => outSub.push(v.raw));
+		Hist.setSuppressHistory(true);
+		Hist.replaceHistoryHash(`${link}${outSub.length ? `${HASH_PART_SEP}${outSub.join(HASH_PART_SEP)}` : ""}`);
 
-			Hist.setSuppressHistory(true);
-			Hist.replaceHistoryHash(`${link}${outSub.length ? `${HASH_PART_SEP}${outSub.join(HASH_PART_SEP)}` : ""}`);
-
-			if (filterInitialSearch && ($iptSearch || this._$iptSearch)) ($iptSearch || this._$iptSearch).val(filterInitialSearch).change().keydown().keyup();
-			this.fireChangeEvent();
-			Hist.hashChange();
-			return outSub;
-		} else return subHashes;
+		if (filterInitialSearch && ($iptSearch || this._$iptSearch)) ($iptSearch || this._$iptSearch).val(filterInitialSearch).change().keydown().keyup();
+		this.fireChangeEvent();
+		Hist.hashChange();
+		return outSub;
 	}
 
 	_setFromSubHashState (urlHeaderToFilter, filterBoxState) {
@@ -1134,6 +1147,7 @@ class FilterBase extends BaseComponent {
 	setFromValues () { throw new Error(`Unimplemented!`); }
 	handleSearch () { throw new Error(`Unimplemented`); }
 	_doTeardown () { /* No-op */ }
+	trimState_ () { /* No-op */ }
 }
 FilterBase._DEFAULT_META = {
 	isHidden: false,
@@ -1191,7 +1205,7 @@ class Filter extends FilterBase {
 	 * @param [opts.umbrellaItems] Items which should, when set active, show everything in the filter. E.g. "All".
 	 * @param [opts.umbrellaExcludes] Items which should ignore the state of any `umbrellaItems`
 	 * @param [opts.isSortByDisplayItems] If items should be sorted by their display value, rather than their internal value.
-	 * @param [opts.isSrdFilter] If this filter's items include the "SRD" tag.
+	 * @param [opts.isMiscFilter] If this is the Misc. filter (containing "SRD" and "Basic Rules" tags).
 	 */
 	constructor (opts) {
 		super(opts);
@@ -1211,7 +1225,9 @@ class Filter extends FilterBase {
 		this._umbrellaItems = Filter._getAsFilterItems(opts.umbrellaItems);
 		this._umbrellaExcludes = Filter._getAsFilterItems(opts.umbrellaExcludes);
 		this._isSortByDisplayItems = !!opts.isSortByDisplayItems;
-		this._isSrdFilter = !!opts.isSrdFilter;
+		this._isReprintedFilter = !!opts.isMiscFilter && this._items.some(it => it.item === "Reprinted");
+		this._isSrdFilter = !!opts.isMiscFilter && this._items.some(it => it.item === "SRD");
+		this._isBasicRulesFilter = !!opts.isMiscFilter && this._items.some(it => it.item === "Basic Rules");
 
 		Filter._validateItemNests(this._items, this._nests);
 
@@ -1229,7 +1245,9 @@ class Filter extends FilterBase {
 		this._pillGroupsMeta = {};
 	}
 
+	get isReprintedFilter () { return this._isReprintedFilter; }
 	get isSrdFilter () { return this._isSrdFilter; }
+	get isBasicRulesFilter () { return this._isBasicRulesFilter; }
 
 	getSaveableState () {
 		return {
@@ -1402,7 +1420,6 @@ class Filter extends FilterBase {
 		const hook = () => {
 			const val = FilterBox._PILL_STATES[this._state[item.item]];
 			btnPill.attr("state", val);
-			if (item.pFnChange) item.pFnChange(item.item, val);
 		};
 		this._addHook("state", item.item, hook);
 		hook();
@@ -1442,7 +1459,12 @@ class Filter extends FilterBase {
 			},
 		}).attr("state", FilterBox._PILL_STATES[this._state[item.item]]);
 
-		const hook = () => btnMini.attr("state", FilterBox._PILL_STATES[this._state[item.item]]);
+		const hook = () => {
+			const val = FilterBox._PILL_STATES[this._state[item.item]];
+			btnMini.attr("state", val);
+			// Bind change handlers in the mini-pill render step, as the mini-pills should always be available.
+			if (item.pFnChange) item.pFnChange(item.item, val);
+		};
 		this._addHook("state", item.item, hook);
 
 		const hideHook = () => btnMini.toggleClass("ve-hidden", this._filterBox.isMinisHidden(this.header));
@@ -1501,11 +1523,11 @@ class Filter extends FilterBase {
 
 		const wrpStateBtnsOuter = e_({
 			tag: "div",
-			clazz: "flex-v-center fltr__h-wrp-state-btns-outer",
+			clazz: "ve-flex-v-center fltr__h-wrp-state-btns-outer",
 			children: [
 				e_({
 					tag: "div",
-					clazz: "btn-group flex-v-center w-100",
+					clazz: "btn-group ve-flex-v-center w-100",
 					children: [
 						btnAll,
 						btnClear,
@@ -1517,7 +1539,7 @@ class Filter extends FilterBase {
 		});
 		this._getHeaderControls_addExtraStateBtns(opts, wrpStateBtnsOuter);
 
-		const wrpSummary = e_({tag: "div", clazz: "flex-vh-center ve-hidden"});
+		const wrpSummary = e_({tag: "div", clazz: "ve-flex-vh-center ve-hidden"});
 
 		const btnCombineBlue = e_({
 			tag: "button",
@@ -1570,11 +1592,11 @@ class Filter extends FilterBase {
 
 		return e_({
 			tag: "div",
-			clazz: `flex-v-center fltr__h-wrp-btns-outer`,
+			clazz: `ve-flex-v-center fltr__h-wrp-btns-outer`,
 			children: [
 				wrpSummary,
 				wrpStateBtnsOuter,
-				e_({tag: "span", clazz: `btn-group ml-2 flex-v-center`, children: [btnCombineBlue, btnCombineRed]}),
+				e_({tag: "span", clazz: `btn-group ml-2 ve-flex-v-center`, children: [btnCombineBlue, btnCombineRed]}),
 				btnShowHide,
 			],
 		});
@@ -1599,7 +1621,7 @@ class Filter extends FilterBase {
 
 		if (this._nests) {
 			const wrpNestHead = e_({tag: "div", clazz: "fltr__wrp-pills--sub"}).appendTo(this.__wrpPills);
-			this.__$wrpNestHeadInner = e_({tag: "div", clazz: "flex flex-wrap"}).appendTo(wrpNestHead);
+			this.__$wrpNestHeadInner = e_({tag: "div", clazz: "ve-flex ve-flex-wrap"}).appendTo(wrpNestHead);
 
 			const wrpNestHeadSummary = e_({tag: "div", clazz: "fltr__summary_nest"}).appendTo(wrpNestHead);
 
@@ -1643,7 +1665,7 @@ class Filter extends FilterBase {
 		this.__$wrpFilter = $$`<div>
 			${opts.isFirst ? "" : `<div class="fltr__dropdown-divider ${opts.isMulti ? "fltr__dropdown-divider--indented" : ""} mb-1"></div>`}
 			<div class="split fltr__h ${this._minimalUi ? "fltr__minimal-hide" : ""} mb-1">
-				<div class="ml-2 fltr__h-text flex-h-center">${opts.isMulti ? `<span class="mr-2">\u2012</span>` : ""}${this._getRenderedHeader()}${btnMobToggleControls}</div>
+				<div class="ml-2 fltr__h-text ve-flex-h-center">${opts.isMulti ? `<span class="mr-2">\u2012</span>` : ""}${this._getRenderedHeader()}${btnMobToggleControls}</div>
 				${wrpControls}
 			</div>
 			${this.__wrpPills}
@@ -2094,11 +2116,29 @@ class SourceFilterItem extends FilterItem {
 }
 
 class SourceFilter extends Filter {
+	static _SORT_ITEMS_MINI (a, b) {
+		a = a.item ?? a;
+		b = b.item ?? b;
+		const valA = BrewUtil.hasSourceJson(a) ? 2 : SourceUtil.isNonstandardSource(a) ? 1 : 0;
+		const valB = BrewUtil.hasSourceJson(b) ? 2 : SourceUtil.isNonstandardSource(b) ? 1 : 0;
+		return SortUtil.ascSort(valA, valB) || SortUtil.ascSortLower(Parser.sourceJsonToFull(a), Parser.sourceJsonToFull(b));
+	}
+
+	static _getDisplayHtmlMini (item) {
+		item = item.item || item;
+		const isBrewSource = BrewUtil.hasSourceJson(item);
+		const isNonStandardSource = !isBrewSource && SourceUtil.isNonstandardSource(item);
+		return `<span ${isBrewSource ? `title="(Homebrew)"` : isNonStandardSource ? `title="(UA/Etc.)"` : ""} class="glyphicon ${isBrewSource ? `glyphicon-glass` : isNonStandardSource ? `glyphicon-file` : `glyphicon-book`}"></span> ${Parser.sourceJsonToAbv(item.item || item)}`;
+	}
+
 	constructor (opts) {
 		opts = opts || {};
 
 		opts.header = opts.header === undefined ? FilterBox.SOURCE_HEADER : opts.header;
 		opts.displayFn = opts.displayFn === undefined ? item => Parser.sourceJsonToFullCompactPrefix(item.item || item) : opts.displayFn;
+		opts.displayFnMini = opts.displayFnMini === undefined ? SourceFilter._getDisplayHtmlMini.bind(SourceFilter) : opts.displayFnMini;
+		opts.displayFnTitle = opts.displayFnTitle === undefined ? item => Parser.sourceJsonToFull(item.item || item) : opts.displayFnTitle;
+		opts.itemSortFnMini = opts.itemSortFnMini === undefined ? SourceFilter._SORT_ITEMS_MINI.bind(SourceFilter) : opts.itemSortFnMini;
 		opts.itemSortFn = opts.itemSortFn === undefined ? (a, b) => SortUtil.ascSortLower(Parser.sourceJsonToFull(a.item), Parser.sourceJsonToFull(b.item)) : opts.itemSortFn;
 		opts.groupFn = opts.groupFn === undefined ? SourceUtil.getFilterGroup : opts.groupFn;
 		opts.selFn = opts.selFn === undefined ? PageFilter.defaultSourceSelFn : opts.selFn;
@@ -2177,6 +2217,11 @@ class SourceFilter extends Filter {
 			new ContextUtil.Action(
 				"Select SRD Sources",
 				() => this._doSetPinsSrd(),
+				{title: `Select System Reference Document Sources.`},
+			),
+			new ContextUtil.Action(
+				"Select Basic Rules Sources",
+				() => this._doSetPinsBasicRules(),
 			),
 			null,
 			new ContextUtil.Action(
@@ -2206,7 +2251,7 @@ class SourceFilter extends Filter {
 
 		e_({
 			tag: "div",
-			clazz: `btn-group mr-2 w-100 flex-v-center mobile__m-1 mobile__mb-2`,
+			clazz: `btn-group mr-2 w-100 ve-flex-v-center mobile__m-1 mobile__mb-2`,
 			children: [
 				btnSupplements,
 				btnAdventures,
@@ -2247,8 +2292,30 @@ class SourceFilter extends Filter {
 		Object.keys(this._state).forEach(k => this._state[k] = SourceFilter._SRD_SOURCES.has(k) ? 1 : 0);
 
 		const srdFilter = this._filterBox.filters.find(it => it.isSrdFilter);
-		if (!srdFilter) return;
-		srdFilter.setValue("SRD", 1);
+		if (srdFilter) srdFilter.setValue("SRD", 1);
+
+		const basicRulesFilter = this._filterBox.filters.find(it => it.isBasicRulesFilter);
+		if (basicRulesFilter) basicRulesFilter.setValue("Basic Rules", 0);
+
+		// also disable "Reprinted" otherwise some Deities are missing
+		const reprintedFilter = this._filterBox.filters.find(it => it.isReprintedFilter);
+		if (reprintedFilter) reprintedFilter.setValue("Reprinted", 0);
+	}
+
+	_doSetPinsBasicRules () {
+		SourceFilter._BASIC_RULES_SOURCES = SourceFilter._BASIC_RULES_SOURCES || new Set([SRC_PHB, SRC_MM, SRC_DMG]);
+
+		Object.keys(this._state).forEach(k => this._state[k] = SourceFilter._BASIC_RULES_SOURCES.has(k) ? 1 : 0);
+
+		const basicRulesFilter = this._filterBox.filters.find(it => it.isBasicRulesFilter);
+		if (basicRulesFilter) basicRulesFilter.setValue("Basic Rules", 1);
+
+		const srdFilter = this._filterBox.filters.find(it => it.isSrdFilter);
+		if (srdFilter) srdFilter.setValue("SRD", 0);
+
+		// also disable "Reprinted" otherwise some Deities are missing
+		const reprintedFilter = this._filterBox.filters.find(it => it.isReprintedFilter);
+		if (reprintedFilter) reprintedFilter.setValue("Reprinted", 0);
 	}
 
 	static getCompleteFilterSources (ent) {
@@ -2279,7 +2346,7 @@ class SourceFilter extends Filter {
 
 		const wrpWrpSlider = e_({
 			tag: "div",
-			clazz: `"w-100 flex pt-2 pb-5 mb-2 mt-1 fltr-src__wrp-slider`,
+			clazz: `"w-100 ve-flex pt-2 pb-5 mb-2 mt-1 fltr-src__wrp-slider`,
 			children: [
 				wrpSlider,
 			],
@@ -2365,7 +2432,7 @@ class SourceFilter extends Filter {
 
 		const grpBtnsActive = e_({
 			tag: "div",
-			clazz: `flex-v-center btn-group`,
+			clazz: `ve-flex-v-center btn-group`,
 			children: [
 				btnCancel,
 				btnConfirm,
@@ -2374,7 +2441,7 @@ class SourceFilter extends Filter {
 
 		const grpBtnsInactive = e_({
 			tag: "div",
-			clazz: `flex-v-center btn-group`,
+			clazz: `ve-flex-v-center btn-group`,
 			children: [
 				btnClear,
 				btnShowSlider,
@@ -2383,12 +2450,12 @@ class SourceFilter extends Filter {
 
 		return e_({
 			tag: "div",
-			clazz: `flex-col w-100`,
+			clazz: `ve-flex-col w-100`,
 			children: [
 				super._doRenderPills_doRenderWrpGroup_getHrDivider(),
 				e_({
 					tag: "div",
-					clazz: `mb-1 flex-h-right`,
+					clazz: `mb-1 ve-flex-h-right`,
 					children: [
 						grpBtnsActive,
 						grpBtnsInactive,
@@ -2435,6 +2502,7 @@ SourceFilter._DEFAULT_META = {
 	isIncludeOtherSources: false,
 };
 SourceFilter._SRD_SOURCES = null;
+SourceFilter._BASIC_RULES_SOURCES = null;
 
 class RangeFilter extends FilterBase {
 	/**
@@ -2463,8 +2531,6 @@ class RangeFilter extends FilterBase {
 
 		this._min = Number(opts.min || 0);
 		this._max = Number(opts.max || 0);
-		this._hasPredefinedMin = opts.min != null;
-		this._hasPredefinedMax = opts.max != null;
 		this._labels = opts.isLabelled ? opts.labels : null;
 		this._isAllowGreater = !!opts.isAllowGreater;
 		this._isRequireFullRangeMatch = !!opts.isRequireFullRangeMatch;
@@ -2494,6 +2560,11 @@ class RangeFilter extends FilterBase {
 		this._$btnMiniGt = null;
 		this._$btnMiniLt = null;
 		this._$btnMiniEq = null;
+
+		// region Trimming
+		this._seenMin = this._min;
+		this._seenMax = this._max;
+		// endregion
 	}
 
 	set isUseDropdowns (val) { this._meta.isUseDropdowns = !!val; }
@@ -2508,48 +2579,42 @@ class RangeFilter extends FilterBase {
 	}
 
 	setStateFromLoaded (filterState) {
-		if (filterState && filterState[this.header]) {
-			const toLoad = filterState[this.header];
+		if (!filterState?.[this.header]) return;
 
-			// region Ensure the provided min/max are a lower/upper bounds for the range to be set
-			if (this._hasPredefinedMax) {
-				const tgt = (toLoad.state || {});
+		const toLoad = filterState[this.header];
 
-				if (tgt.max == null) tgt.max = this._max;
-				else if (tgt.max > this._max) tgt.max = this._max;
+		// region Ensure to-be-loaded state is populated with sensible data
+		const tgt = (toLoad.state || {});
 
-				if (tgt.curMax == null) tgt.curMax = tgt.max;
-				else if (tgt.curMax > tgt.max) tgt.curMax = tgt.max;
-			}
-
-			if (this._hasPredefinedMin) {
-				const tgt = (toLoad.state || {});
-
-				if (tgt.min == null) tgt.min = this._min;
-				else if (tgt.min < this._min) tgt.min = this._min;
-
-				if (tgt.curMin == null) tgt.curMin = tgt.min;
-				else if (tgt.curMin < tgt.min) tgt.curMin = tgt.min;
-			}
-			// endregion
-
-			this.setBaseStateFromLoaded(toLoad);
-
-			// Reduce the maximum/minimum ranges to their current values +/-1
-			//   This allows the range filter to recover from being stretched out by homebrew
-			//   The off-by-one trick is to prevent later filter expansion from assuming the filters are set to their min/max
-			if (toLoad.state && !this._labels) {
-				if (!this._hasPredefinedMax && toLoad.state.curMax != null && toLoad.state.max != null) {
-					if (toLoad.state.curMax + 1 < toLoad.state.max) toLoad.state.max = toLoad.state.curMax + 1;
-				}
-
-				if (!this._hasPredefinedMin && toLoad.state.curMin != null && toLoad.state.min != null) {
-					if (toLoad.state.curMin - 1 > toLoad.state.min) toLoad.state.min = toLoad.state.curMin - 1;
-				}
-			}
-
-			Object.assign(this._state, toLoad.state);
+		if (tgt.max == null) tgt.max = this._max;
+		else if (this._max > tgt.max) {
+			if (tgt.max === tgt.curMax) tgt.curMax = this._max; // If it's set to "max", respect this
+			tgt.max = this._max;
 		}
+
+		if (tgt.curMax == null) tgt.curMax = tgt.max;
+		else if (tgt.curMax > tgt.max) tgt.curMax = tgt.max;
+
+		if (tgt.min == null) tgt.min = this._min;
+		else if (this._min < tgt.min) {
+			if (tgt.min === tgt.curMin) tgt.curMin = this._min; // If it's set to "min", respect this
+			tgt.min = this._min;
+		}
+
+		if (tgt.curMin == null) tgt.curMin = tgt.min;
+		else if (tgt.curMin < tgt.min) tgt.curMin = tgt.min;
+		// endregion
+
+		this.setBaseStateFromLoaded(toLoad);
+
+		Object.assign(this._state, toLoad.state);
+	}
+
+	trimState_ () {
+		if (this._seenMin <= this._state.min && this._seenMax >= this._state.max) return;
+
+		const nxtState = {min: this._seenMin, curMin: this._seenMin, max: this._seenMax, curMax: this._seenMax};
+		this._proxyAssignSimple("state", nxtState);
 	}
 
 	getSubHashes () {
@@ -2632,7 +2697,7 @@ class RangeFilter extends FilterBase {
 		const $btnReset = $(`<button class="btn btn-default btn-xs">Reset</button>`).click(() => this.reset());
 		const $wrpBtns = $$`<div>${$btnForceMobile}${$btnReset}</div>`;
 
-		const $wrpSummary = $(`<div class="flex-v-center fltr__summary_item fltr__summary_item--include"></div>`).hideVe();
+		const $wrpSummary = $(`<div class="ve-flex-v-center fltr__summary_item fltr__summary_item--include"></div>`).hideVe();
 
 		const $btnShowHide = $(`<button class="btn btn-default btn-xs ml-2 ${this._meta.isHidden ? "active" : ""}">Hide</button>`)
 			.click(() => this._meta.isHidden = !this._meta.isHidden);
@@ -2655,7 +2720,7 @@ class RangeFilter extends FilterBase {
 		hkIsHidden();
 
 		return $$`
-		<div class="flex-v-center">
+		<div class="ve-flex-v-center">
 			${$wrpBtns}
 			${$wrpSummary}
 			${$btnShowHide}
@@ -2663,7 +2728,7 @@ class RangeFilter extends FilterBase {
 	}
 
 	_getDisplayText (value, {isBeyondMax = false, isTooltip = false} = {}) {
-		value = `${this._labels ? this._labelDisplayFn ? this._labelDisplayFn(value) : value : (isTooltip && this._displayFnTooltip) ? this._displayFnTooltip(value) : this._displayFn ? this._displayFn(value) : value}${isBeyondMax ? "+" : ""}`;
+		value = `${this._labels ? this._labelDisplayFn ? this._labelDisplayFn(this._labels[value]) : this._labels[value] : (isTooltip && this._displayFnTooltip) ? this._displayFnTooltip(value) : this._displayFn ? this._displayFn(value) : value}${isBeyondMax ? "+" : ""}`;
 		if (this._suffix) value += this._suffix;
 		return value;
 	}
@@ -2710,19 +2775,7 @@ class RangeFilter extends FilterBase {
 		// prepare slider options
 		const getSliderOpts = () => {
 			const fnDisplay = (val, {isTooltip = false} = {}) => {
-				let out;
-
-				if (this._labels) {
-					if (this._labelSortFn) this._labels.sort(this._labelSortFn);
-
-					const labels = this._labelDisplayFn ? this._labels.map(it => this._labelDisplayFn(it)) : this._labels;
-
-					out = labels[val] ?? val;
-				} else {
-					out = this._getDisplayText(val, {isBeyondMax: this._isAllowGreater && val === this._state.max, isTooltip});
-				}
-
-				return out;
+				return this._getDisplayText(val, {isBeyondMax: this._isAllowGreater && val === this._state.max, isTooltip});
 			};
 
 			return {
@@ -2769,7 +2822,7 @@ class RangeFilter extends FilterBase {
 				this._state.curMax = max;
 			},
 		});
-		$$`<div class="flex-v-center w-100 px-3 py-1">${selMin}${selMax}</div>`.appendTo($wrpDropdowns);
+		$$`<div class="ve-flex-v-center w-100 px-3 py-1">${selMin}${selMax}</div>`.appendTo($wrpDropdowns);
 		// endregion
 
 		const handleCurUpdate = () => {
@@ -2796,7 +2849,7 @@ class RangeFilter extends FilterBase {
 			$wrpSlider.addClass("ve-grow");
 			$wrpDropdowns.addClass("ve-grow");
 
-			return this.__$wrpFilter = $$`<div class="flex">
+			return this.__$wrpFilter = $$`<div class="ve-flex">
 				<div class="fltr__range-inline-label">${this._getRenderedHeader()}</div>
 				${$wrpSlider}
 				${$wrpDropdowns}
@@ -2804,10 +2857,10 @@ class RangeFilter extends FilterBase {
 		} else {
 			const btnMobToggleControls = this._getBtnMobToggleControls($wrpControls);
 
-			return this.__$wrpFilter = $$`<div class="flex-col">
+			return this.__$wrpFilter = $$`<div class="ve-flex-col">
 				${opts.isFirst ? "" : `<div class="fltr__dropdown-divider mb-1"></div>`}
 				<div class="split fltr__h ${this._minimalUi ? "fltr__minimal-hide" : ""} mb-1">
-					<div class="fltr__h-text flex-h-center">${this._getRenderedHeader()}${btnMobToggleControls}</div>
+					<div class="fltr__h-text ve-flex-h-center">${this._getRenderedHeader()}${btnMobToggleControls}</div>
 					${$wrpControls}
 				</div>
 				${$wrpSlider}
@@ -2859,16 +2912,16 @@ class RangeFilter extends FilterBase {
 
 				this._$btnMiniEq
 					.attr("state", this._state.min === this._state.curMin && this._state.max === this._state.curMax ? FilterBox._PILL_STATES[0] : FilterBox._PILL_STATES[1])
-					.text(`${this.header} = ${this._labels ? this._labels[this._state.curMin] : this._state.curMin}`);
+					.text(`${this.header} = ${this._getDisplayText(this._state.curMin, {isBeyondMax: this._isAllowGreater && this._state.curMin === this._state.max})}`);
 			} else {
 				if (this._state.min !== this._state.curMin) {
 					this._$btnMiniGt.attr("state", FilterBox._PILL_STATES[1])
-						.text(`${this.header} ≥ ${this._labels ? this._labels[this._state.curMin] : this._state.curMin}${this._suffix || ""}`);
+						.text(`${this.header} ≥ ${this._getDisplayText(this._state.curMin)}`);
 				} else this._$btnMiniGt.attr("state", FilterBox._PILL_STATES[0]);
 
 				if (this._state.max !== this._state.curMax) {
 					this._$btnMiniLt.attr("state", FilterBox._PILL_STATES[1])
-						.text(`${this.header} ≤ ${this._labels ? this._labels[this._state.curMax] : this._state.curMax}${this._suffix || ""}`);
+						.text(`${this.header} ≤ ${this._getDisplayText(this._state.curMax)}`);
 				} else this._$btnMiniLt.attr("state", FilterBox._PILL_STATES[0]);
 
 				this._$btnMiniEq.attr("state", FilterBox._PILL_STATES[0]);
@@ -2939,6 +2992,10 @@ class RangeFilter extends FilterBase {
 
 		if (this._labels) {
 			const slice = this._labels.slice(filterState.min, filterState.max + 1);
+
+			// Special case for "isAllowGreater" filters, which assumes the labels are numerical values
+			if (this._isAllowGreater && filterState.max === this._state.max && entryVal > this._state.max) return true;
+
 			if (entryVal instanceof Array) return !!entryVal.find(it => slice.includes(it));
 			return slice.includes(entryVal);
 		} else {
@@ -2986,6 +3043,9 @@ class RangeFilter extends FilterBase {
 
 	_addItem_addNumber (number) {
 		if (number == null || isNaN(number)) return;
+
+		this._seenMin = Math.min(this._seenMin, number);
+		this._seenMax = Math.max(this._seenMax, number);
 
 		if (this._sparseValues && !this._sparseValues.includes(number)) {
 			this._sparseValues.push(number);
@@ -3148,15 +3208,15 @@ class OptionsFilter extends FilterBase {
 		const $wrpButtons = $$`<div>${$btns}</div>`;
 
 		if (opts.isMulti) {
-			return this.__$wrpFilter = $$`<div class="flex">
+			return this.__$wrpFilter = $$`<div class="ve-flex">
 				<div class="fltr__range-inline-label">${this._getRenderedHeader()}</div>
 				${$wrpButtons}
 			</div>`;
 		} else {
-			return this.__$wrpFilter = $$`<div class="flex-col">
+			return this.__$wrpFilter = $$`<div class="ve-flex-col">
 				${opts.isFirst ? "" : `<div class="fltr__dropdown-divider mb-1"></div>`}
 				<div class="split fltr__h ${this._minimalUi ? "fltr__minimal-hide" : ""} mb-1">
-					<div class="fltr__h-text flex-h-center">${this._getRenderedHeader()}</div>
+					<div class="fltr__h-text ve-flex-h-center">${this._getRenderedHeader()}</div>
 					${$wrpControls}
 				</div>
 				${$wrpButtons}
@@ -3216,9 +3276,9 @@ class OptionsFilter extends FilterBase {
 
 	_$getHeaderControls () {
 		const $btnReset = $(`<button class="btn btn-default btn-xs">Reset</button>`).click(() => this.reset());
-		const $wrpBtns = $$`<div class="flex-v-center">${$btnReset}</div>`;
+		const $wrpBtns = $$`<div class="ve-flex-v-center">${$btnReset}</div>`;
 
-		const $wrpSummary = $(`<div class="flex-v-center fltr__summary_item fltr__summary_item--include"></div>`).hideVe();
+		const $wrpSummary = $(`<div class="ve-flex-v-center fltr__summary_item fltr__summary_item--include"></div>`).hideVe();
 
 		const $btnShowHide = $(`<button class="btn btn-default btn-xs ml-2 ${this._meta.isHidden ? "active" : ""}">Hide</button>`)
 			.click(() => this._meta.isHidden = !this._meta.isHidden);
@@ -3238,7 +3298,7 @@ class OptionsFilter extends FilterBase {
 		hkIsHidden();
 
 		return $$`
-		<div class="flex-v-center">
+		<div class="ve-flex-v-center">
 			${$wrpBtns}
 			${$wrpSummary}
 			${$btnShowHide}
@@ -3405,7 +3465,7 @@ class MultiFilter extends FilterBase {
 			click: () => this._filters.forEach(it => it.reset()),
 		});
 
-		const wrpBtns = e_({tag: "div", clazz: "flex", children: [btnForceMobile, btnResetAll].filter(Boolean)});
+		const wrpBtns = e_({tag: "div", clazz: "ve-flex", children: [btnForceMobile, btnResetAll].filter(Boolean)});
 		this._getHeaderControls_addExtraStateBtns(opts, wrpBtns);
 
 		const btnShowHide = e_({
@@ -3414,7 +3474,7 @@ class MultiFilter extends FilterBase {
 			text: "Hide",
 			click: () => this._meta.isHidden = !this._meta.isHidden,
 		});
-		const wrpControls = e_({tag: "div", clazz: "flex-v-center", children: [wrpSummary, wrpBtns, btnShowHide]});
+		const wrpControls = e_({tag: "div", clazz: "ve-flex-v-center", children: [wrpSummary, wrpBtns, btnShowHide]});
 
 		const hookShowHide = () => {
 			wrpBtns.toggleVe(!this._meta.isHidden);
@@ -3447,10 +3507,10 @@ class MultiFilter extends FilterBase {
 
 		const wrpControls = this._getHeaderControls(opts);
 
-		return this.__$wrpFilter = $$`<div class="flex-col">
+		return this.__$wrpFilter = $$`<div class="ve-flex-col">
 			${opts.isFirst ? "" : `<div class="fltr__dropdown-divider mb-1"></div>`}
 			<div class="split fltr__h fltr__h--multi ${this._minimalUi ? "fltr__minimal-hide" : ""} mb-1">
-				<div class="flex-v-center">
+				<div class="ve-flex-v-center">
 					<div class="mr-2">${this._getRenderedHeader()}</div>
 					${$btnAndOr}
 				</div>

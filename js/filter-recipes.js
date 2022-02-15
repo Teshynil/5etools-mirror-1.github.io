@@ -4,7 +4,6 @@ class PageFilterRecipes extends PageFilter {
 	constructor () {
 		super();
 
-		this._sourceFilter = new SourceFilter();
 		this._typeFilter = new Filter({
 			header: "Type",
 			displayFn: StrUtil.toTitleCase,
@@ -29,7 +28,7 @@ class PageFilterRecipes extends PageFilter {
 		this._miscFilter = new Filter({
 			header: "Miscellaneous",
 			items: ["SRD"],
-			isSrdFilter: true,
+			isMiscFilter: true,
 			displayFn: PageFilterRecipes._miscTagToFull,
 		});
 	}

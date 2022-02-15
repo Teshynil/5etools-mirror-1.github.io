@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "spells.json",
-	"version": "1.7.0",
+	"version": "1.7.5",
 	"title": "Spells",
 	"type": "object",
 	"definitions": {
@@ -389,15 +389,18 @@
 				},
 				"miscTags": {
 					"type": "array",
-					"description": "FMV: Forced Movement\n HL: Healing\n MAC: Modifies AC\n PRM: Permanent Effects\n SCL: Scaling Effects\n  SMN: Summons Creature\n SGT: Requires Sight\n THP: Grants Temporary Hit Points\n TP: Teleportation",
+					"description": "FMV: Forced Movement\n HL: Healing\n LGT: Creates Light\n LGTS: Creates Sunlight\n MAC: Modifies AC\n PRM: Permanent Effects\n RO: Rollable Effects\n SCL: Scaling Effects\n  SMN: Summons Creature\n SGT: Requires Sight\n THP: Grants Temporary Hit Points\n TP: Teleportation",
 					"uniqueItems": true,
 					"items": {
 						"type": "string",
 						"enum": [
 							"FMV",
 							"HL",
+							"LGT",
+							"LGTS",
 							"MAC",
 							"PRM",
+							"RO",
 							"SCL",
 							"SMN",
 							"SGT",
@@ -406,8 +409,17 @@
 						]
 					}
 				},
+				"affectsCreatureType": {
+					"type": "array",
+					"items": {
+						"$ref": "../util.json#/definitions/creatureType"
+					}
+				},
 				"srd": {
 					"$ref": "../util.json#/definitions/srd"
+				},
+				"basicRules": {
+					"$ref": "../util.json#/definitions/basicRules"
 				},
 				"scalingLevelDice": {
 					"oneOf": [
@@ -875,15 +887,18 @@
 						},
 						"miscTags": {
 							"type": "array",
-							"description": "FMV: Forced Movement\n HL: Healing\n MAC: Modifies AC\n PRM: Permanent Effects\n SCL: Scaling Effects\n  SMN: Summons Creature\n SGT: Requires Sight\n THP: Grants Temporary Hit Points\n TP: Teleportation",
+							"description": "FMV: Forced Movement\n HL: Healing\n LGT: Creates Light\n LGTS: Creates Sunlight\n MAC: Modifies AC\n PRM: Permanent Effects\n RO: Rollable Effects\n SCL: Scaling Effects\n  SMN: Summons Creature\n SGT: Requires Sight\n THP: Grants Temporary Hit Points\n TP: Teleportation",
 							"uniqueItems": true,
 							"items": {
 								"type": "string",
 								"enum": [
 									"FMV",
 									"HL",
+									"LGT",
+									"LGTS",
 									"MAC",
 									"PRM",
+									"RO",
 									"SCL",
 									"SMN",
 									"SGT",
@@ -892,8 +907,17 @@
 								]
 							}
 						},
+						"affectsCreatureType": {
+							"type": "array",
+							"items": {
+								"$ref": "../util.json#/definitions/creatureType"
+							}
+						},
 						"srd": {
 							"$ref": "../util.json#/definitions/srd"
+						},
+						"basicRules": {
+							"$ref": "../util.json#/definitions/basicRules"
 						},
 						"scalingLevelDice": {
 							"oneOf": [
@@ -1369,15 +1393,18 @@
 						},
 						"miscTags": {
 							"type": "array",
-							"description": "FMV: Forced Movement\n HL: Healing\n MAC: Modifies AC\n PRM: Permanent Effects\n SCL: Scaling Effects\n  SMN: Summons Creature\n SGT: Requires Sight\n THP: Grants Temporary Hit Points\n TP: Teleportation",
+							"description": "FMV: Forced Movement\n HL: Healing\n LGT: Creates Light\n LGTS: Creates Sunlight\n MAC: Modifies AC\n PRM: Permanent Effects\n RO: Rollable Effects\n SCL: Scaling Effects\n  SMN: Summons Creature\n SGT: Requires Sight\n THP: Grants Temporary Hit Points\n TP: Teleportation",
 							"uniqueItems": true,
 							"items": {
 								"type": "string",
 								"enum": [
 									"FMV",
 									"HL",
+									"LGT",
+									"LGTS",
 									"MAC",
 									"PRM",
+									"RO",
 									"SCL",
 									"SMN",
 									"SGT",
@@ -1386,8 +1413,17 @@
 								]
 							}
 						},
+						"affectsCreatureType": {
+							"type": "array",
+							"items": {
+								"$ref": "../util.json#/definitions/creatureType"
+							}
+						},
 						"srd": {
 							"$ref": "../util.json#/definitions/srd"
+						},
+						"basicRules": {
+							"$ref": "../util.json#/definitions/basicRules"
 						},
 						"scalingLevelDice": {
 							"oneOf": [
@@ -1481,7 +1517,15 @@
 					"type": "integer"
 				},
 				"unit": {
-					"type": "string"
+					"type": "string",
+					"enum": [
+						"action",
+						"bonus",
+						"reaction",
+						"round",
+						"minute",
+						"hour"
+					]
 				},
 				"condition": {
 					"type": "string"

@@ -145,25 +145,25 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "1. Psyche-Reconstruction Ray.",
+									"name": "1. Psyche-Reconstruction Ray",
 									"style": "italic",
 									"entry": "The target must make a {@dc 22} Wisdom saving throw, taking 49 ({@damage 9d10}) psychic damage on a failed save, or half as much damage on a successful one. If this damage reduces a creature to 0 hit points, it dies and transforms into a spectator under Belashyrra's control and acts immediately after Belashyrra in the initiative order. The target can't be returned to its original form by any means short of a {@spell wish} spell."
 								},
 								{
 									"type": "item",
-									"name": "2. Domination Ray.",
+									"name": "2. Domination Ray",
 									"style": "italic",
 									"entry": "The target must succeed on a {@dc 22} Wisdom saving throw or be {@condition charmed} by Belashyrra for 1 minute or until the target takes damage. Belashyrra can issue telepathic commands to the {@condition charmed} creature (no action required), which it does its best to obey."
 								},
 								{
 									"type": "item",
-									"name": "3. Mind-Weakening Ray.",
+									"name": "3. Mind-Weakening Ray",
 									"style": "italic",
 									"entry": "The target must succeed on a {@dc 22} Intelligence saving throw or take 36 ({@damage 8d8}) psychic damage and be unable to cast spells or activate magic items for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success."
 								},
 								{
 									"type": "item",
-									"name": "4. Blinding Ray.",
+									"name": "4. Blinding Ray",
 									"style": "italic",
 									"entry": "The target and each creature within 10 feet of it must succeed on a {@dc 22} Constitution saving throw or take 19 ({@damage 3d12}) radiant damage and be {@condition blinded} for 1 minute. Until this blindness ends, Belyshyrra can see through the {@condition blinded} creature's eyes. The {@condition blinded} creature can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success."
 								}
@@ -483,7 +483,9 @@
 		},
 		{
 			"name": "Clawfoot",
-			"group": "Dinosaurs",
+			"group": [
+				"Dinosaurs"
+			],
 			"source": "ERLW",
 			"page": 289,
 			"otherSources": [
@@ -1165,7 +1167,9 @@
 		},
 		{
 			"name": "Expeditious Messenger",
-			"group": "Homunculi",
+			"group": [
+				"Homunculi"
+			],
 			"source": "ERLW",
 			"page": 293,
 			"size": "T",
@@ -1248,7 +1252,9 @@
 		},
 		{
 			"name": "Fastieth",
-			"group": "Dinosaurs",
+			"group": [
+				"Dinosaurs"
+			],
 			"source": "ERLW",
 			"page": 289,
 			"size": "M",
@@ -1318,7 +1324,9 @@
 		},
 		{
 			"name": "Hashalaq Quori",
-			"group": "Quori",
+			"group": [
+				"Quori"
+			],
 			"source": "ERLW",
 			"page": 305,
 			"size": "M",
@@ -1703,7 +1711,9 @@
 		},
 		{
 			"name": "Iron Defender",
-			"group": "Homunculi",
+			"group": [
+				"Homunculi"
+			],
 			"source": "ERLW",
 			"page": 293,
 			"size": "M",
@@ -1797,7 +1807,9 @@
 		},
 		{
 			"name": "Kalaraq Quori",
-			"group": "Quori",
+			"group": [
+				"Quori"
+			],
 			"source": "ERLW",
 			"page": 306,
 			"size": "M",
@@ -1939,7 +1951,7 @@
 				{
 					"name": "Mind Seed (1/Day)",
 					"entries": [
-						"The quori touches one humanoid, which must succeed on a {@dc 21} Intelligence saving throw or be cursed. The curse lasts until it's removed by a remove curse or greater restoration spell.",
+						"The quori touches one humanoid, which must succeed on a {@dc 21} Intelligence saving throw or be cursed. The curse lasts until it's removed by a remove curse or {@spell greater restoration} spell.",
 						"The cursed target suffers 1 level of {@condition exhaustion} every 24 hours, and finishing a long rest doesn't reduce its {@condition exhaustion}. If the cursed target reaches {@condition exhaustion} level 6, it doesn't die; it instead becomes a thrall under the quori's control, and all its {@condition exhaustion} is removed. Only the {@spell wish} spell can free the thrall from this control."
 					]
 				},
@@ -3028,7 +3040,7 @@
 				{
 					"name": "Attack",
 					"entries": [
-						"Mordakhesh makes one weapon attack or casts chromatic orb."
+						"Mordakhesh makes one weapon attack or casts {@spell chromatic orb}."
 					]
 				},
 				{
@@ -3396,7 +3408,7 @@
 				{
 					"name": "End Magic (Costs 2 Actions)",
 					"entries": [
-						"Rak Tulkhesh casts dispel magic."
+						"Rak Tulkhesh casts {@spell dispel magic}."
 					]
 				},
 				{
@@ -3694,7 +3706,7 @@
 				{
 					"name": "Arcane Cataclysm (Recharges after a Long Rest)",
 					"entries": [
-						"Sul Khatesh conjures orbs of magical energy that plummet to the ground at three different points she can see within 1 mile of her. Each creature in a 40-foot-radius sphere centered on each point must make a {@dc 26} Dexterity saving throw, taking 71 ({@damage 11d12}) force damage on a failed save or half as much damage on a successful one. A creature in the area of more than one arcane burst is affected only once. The area of each arcane burst then acts as an antimagic field for 1 hour. Sul Khatesh and spells she casts are unaffected by these fields."
+						"Sul Khatesh conjures orbs of magical energy that plummet to the ground at three different points she can see within 1 mile of her. Each creature in a 40-foot-radius sphere centered on each point must make a {@dc 26} Dexterity saving throw, taking 71 ({@damage 11d12}) force damage on a failed save or half as much damage on a successful one. A creature in the area of more than one arcane burst is affected only once. The area of each arcane burst then acts as an {@spell antimagic field} for 1 hour. Sul Khatesh and spells she casts are unaffected by these fields."
 					]
 				},
 				{
@@ -4120,16 +4132,18 @@
 				"RCH",
 				"RW"
 			],
-			"hasToken": true,
-			"hasFluff": true,
-			"hasFluffImages": true,
 			"conditionInflict": [
 				"prone"
-			]
+			],
+			"hasToken": true,
+			"hasFluff": true,
+			"hasFluffImages": true
 		},
 		{
 			"name": "Tsucora Quori",
-			"group": "Quori",
+			"group": [
+				"Quori"
+			],
 			"source": "ERLW",
 			"page": 307,
 			"size": "M",
@@ -5384,12 +5398,12 @@
 				"RW",
 				"THW"
 			],
-			"hasToken": true,
-			"hasFluff": true,
-			"hasFluffImages": true,
 			"conditionInflict": [
 				"prone"
-			]
+			],
+			"hasToken": true,
+			"hasFluff": true,
+			"hasFluffImages": true
 		}
 	]
 }

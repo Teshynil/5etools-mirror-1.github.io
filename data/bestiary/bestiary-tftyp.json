@@ -97,7 +97,7 @@
 				{
 					"name": "Antimagic Susceptibility",
 					"entries": [
-						"The table is {@condition incapacitated} while in the area of an antimagic field. If targeted by dispel magic, the table must succeed on a Constitution saving throw against the caster's spell save DC or fall {@condition unconscious} for 1 minute."
+						"The table is {@condition incapacitated} while in the area of an {@spell antimagic field}. If targeted by {@spell dispel magic}, the table must succeed on a Constitution saving throw against the caster's spell save DC or fall {@condition unconscious} for 1 minute."
 					]
 				},
 				{
@@ -2860,15 +2860,15 @@
 			"miscTags": [
 				"MW"
 			],
+			"conditionInflict": [
+				"poisoned"
+			],
 			"conditionInflictSpell": [
 				"invisible",
 				"unconscious"
 			],
 			"hasToken": true,
-			"hasFluff": true,
-			"conditionInflict": [
-				"poisoned"
-			]
+			"hasFluff": true
 		},
 		{
 			"name": "Kalka-Kylla",
@@ -5141,7 +5141,9 @@
 		},
 		{
 			"name": "Snarla",
-			"group": "Lycanthropes",
+			"group": [
+				"Lycanthropes"
+			],
 			"isNpc": true,
 			"source": "TftYP",
 			"page": 102,

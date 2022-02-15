@@ -37,6 +37,17 @@
 				11,
 				11
 			],
+			"optionalfeatureProgression": [
+				{
+					"name": "Fighting Style",
+					"featureType": [
+						"FS:R"
+					],
+					"progression": {
+						"2": 1
+					}
+				}
+			],
 			"startingProficiencies": {
 				"armor": [
 					"light",
@@ -729,6 +740,17 @@
 				"str",
 				"dex"
 			],
+			"optionalfeatureProgression": [
+				{
+					"name": "Fighting Style",
+					"featureType": [
+						"FS:R"
+					],
+					"progression": {
+						"2": 1
+					}
+				}
+			],
 			"startingProficiencies": {
 				"armor": [
 					"light",
@@ -1240,6 +1262,17 @@
 				"dex",
 				"wis"
 			],
+			"optionalfeatureProgression": [
+				{
+					"name": "Fighting Style",
+					"featureType": [
+						"FS:R"
+					],
+					"progression": {
+						"2": 1
+					}
+				}
+			],
 			"startingProficiencies": {
 				"armor": [
 					"light",
@@ -1375,6 +1408,17 @@
 				10,
 				11,
 				11
+			],
+			"optionalfeatureProgression": [
+				{
+					"name": "Fighting Style",
+					"featureType": [
+						"FS:R"
+					],
+					"progression": {
+						"2": 1
+					}
+				}
 			],
 			"startingProficiencies": {
 				"armor": [
@@ -5530,12 +5574,12 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Thaumaturgy.",
+							"name": "Thaumaturgy",
 							"entry": "You learn the {@spell thaumaturgy} cantrip, which is a ranger spell for you."
 						},
 						{
 							"type": "item",
-							"name": "Tongue of Dragons.",
+							"name": "Tongue of Dragons",
 							"entry": "You learn to speak, read, and write Draconic or one other language of your choice."
 						}
 					]
@@ -5581,21 +5625,21 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Drake Mount.",
+							"name": "Drake Mount",
 							"entries": [
 								"The drake grows to Medium size. Reflecting your special bond, you can use the drake as a mount if your size is Medium or smaller. While you are riding your drake, it can't use the flying speed of this feature."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Magic Fang.",
+							"name": "Magic Fang",
 							"entries": [
 								"The drake's Bite attack deals an extra {@damage 1d6} damage of the type chosen for the drake's Draconic Essence."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Resistance.",
+							"name": "Resistance",
 							"entries": [
 								"You gain resistance to the damage type chosen for the drake's Draconic Essence."
 							]
@@ -6323,7 +6367,7 @@
 			"header": 1,
 			"entries": [
 				"{@i 3rd-level Swarmkeeper feature}",
-				"A swarm of intangible nature spirits has bonded itself to you and can assist you in battle. Until you die, the swarm remains in your space, crawling on you or flying and skittering around you within your space. You determine its appearance, or you generate its appearance by rolling on the Swarm Appearance table.",
+				"A swarm of intangible nature spirits has bonded itself to you and can assist you in battle. While you're alive, the swarm remains in your space, crawling on you or flying and skittering around you within your space. You determine its appearance, or you generate its appearance by rolling on the Swarm Appearance table.",
 				{
 					"type": "table",
 					"caption": "Swarm Appearance",
@@ -8070,12 +8114,12 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Thaumaturgy.",
+							"name": "Thaumaturgy",
 							"entry": "You learn the {@spell thaumaturgy} cantrip, which is a ranger spell for you."
 						},
 						{
 							"type": "item",
-							"name": "Tongue of Dragons.",
+							"name": "Tongue of Dragons",
 							"entry": "You learn to speak, read, and write Draconic or one other language of your choice."
 						}
 					]
@@ -8121,21 +8165,21 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Drake Mount.",
+							"name": "Drake Mount",
 							"entries": [
 								"The drake grows to Medium size. Reflecting your special bond, you can use the drake as a mount if your size is Medium or smaller. While you are riding your drake, it can't use the flying speed of this feature."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Magic Fang.",
+							"name": "Magic Fang",
 							"entries": [
 								"The drake's Bite attack deals an extra {@damage 1d6} damage of the type chosen for the drake's Draconic Essence."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Resistance.",
+							"name": "Resistance",
 							"entries": [
 								"You gain resistance to the damage type chosen for the drake's Draconic Essence."
 							]
@@ -8864,7 +8908,7 @@
 			"header": 1,
 			"entries": [
 				"{@i 3rd-level Swarmkeeper feature}",
-				"A swarm of intangible nature spirits has bonded itself to you and can assist you in battle. Until you die, the swarm remains in your space, crawling on you or flying and skittering around you within your space. You determine its appearance, or you generate its appearance by rolling on the Swarm Appearance table.",
+				"A swarm of intangible nature spirits has bonded itself to you and can assist you in battle. While you're alive, the swarm remains in your space, crawling on you or flying and skittering around you within your space. You determine its appearance, or you generate its appearance by rolling on the Swarm Appearance table.",
 				{
 					"type": "table",
 					"caption": "Swarm Appearance",
@@ -10247,12 +10291,12 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Thaumaturgy.",
+							"name": "Thaumaturgy",
 							"entry": "You learn the {@spell thaumaturgy} cantrip, which is a ranger spell for you."
 						},
 						{
 							"type": "item",
-							"name": "Tongue of Dragons.",
+							"name": "Tongue of Dragons",
 							"entry": "You learn to speak, read, and write Draconic or one other language of your choice."
 						}
 					]
@@ -10312,21 +10356,21 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Drake Mount.",
+							"name": "Drake Mount",
 							"entries": [
 								"The drake grows to Medium size. Reflecting your special bond, you can use the drake as a mount if your size is Medium or smaller. While you are riding your drake, it can't use the flying speed of this feature."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Magic Fang.",
+							"name": "Magic Fang",
 							"entries": [
 								"The drake's Bite attack deals an extra {@damage 1d6} damage of the type chosen for the drake's Draconic Essence."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Resistance.",
+							"name": "Resistance",
 							"entries": [
 								"You gain resistance to the damage type chosen for the drake's Draconic Essence."
 							]
@@ -10636,7 +10680,7 @@
 			"header": 1,
 			"entries": [
 				"{@i 3rd-level Swarmkeeper feature}",
-				"A swarm of intangible nature spirits has bonded itself to you and can assist you in battle. Until you die, the swarm remains in your space, crawling on you or flying and skittering around you within your space. You determine its appearance, or you generate its appearance by rolling on the Swarm Appearance table.",
+				"A swarm of intangible nature spirits has bonded itself to you and can assist you in battle. While you're alive, the swarm remains in your space, crawling on you or flying and skittering around you within your space. You determine its appearance, or you generate its appearance by rolling on the Swarm Appearance table.",
 				{
 					"type": "table",
 					"caption": "Swarm Appearance",

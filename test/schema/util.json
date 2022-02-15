@@ -3,7 +3,7 @@
 	"$id": "util.json",
 	"title": "Util",
 	"description": "Utility definitions to be used in other schemas.",
-	"version": "1.11.0",
+	"version": "1.11.7",
 	"definitions": {
 		"metaBlock": {
 			"type": "object",
@@ -64,6 +64,35 @@
 					"source"
 				],
 				"additionalProperties": false
+			}
+		},
+		"reprintedAs": {
+			"type": "array",
+			"items": {
+				"oneOf": [
+					{
+						"description": "A UID, e.g. \"longsword|phb\"",
+						"type": "string"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"uid": {
+								"description": "A UID, e.g. \"longsword|phb\"",
+								"type": "string"
+							},
+							"tag": {
+								"description": "A tag used in the renderer, e.g. \"creature\"",
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"required": [
+							"tag",
+							"uid"
+						]
+					}
+				]
 			}
 		},
 		"languageNameLower": {
@@ -1055,6 +1084,20 @@
 				}
 			}
 		},
+		"additionalFeatsArray": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"any": {
+						"type": "integer"
+					}
+				},
+				"additionalProperties": {
+					"type": "boolean"
+				}
+			}
+		},
 		"proficiencyTag": {
 			"type": "string",
 			"enum": [
@@ -1064,12 +1107,6 @@
 				"Tool Proficiency",
 				"Language Proficiency"
 			]
-		},
-		"proficiencyTags": {
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/proficiencyTag"
-			}
 		},
 		"_speedVal": {
 			"oneOf": [
@@ -1091,6 +1128,9 @@
 				},
 				{
 					"type": "integer"
+				},
+				{
+					"const": true
 				}
 			]
 		},
@@ -1287,6 +1327,12 @@
 						]
 					},
 					"spell": {
+						"type": "array",
+						"items": {
+							"$ref": "entry.json"
+						}
+					},
+					"feat": {
 						"type": "array",
 						"items": {
 							"$ref": "entry.json"
@@ -1838,6 +1884,69 @@
 					}
 				]
 			}
+		},
+		"resourcesArray": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"recharge": {
+						"type": "string"
+					},
+					"count": {
+						"type": [
+							"integer",
+							"string"
+						]
+					},
+					"number": {
+						"type": [
+							"integer",
+							"string"
+						]
+					},
+					"faces": {
+						"type": [
+							"integer",
+							"string"
+						]
+					}
+				},
+				"required": [
+					"name",
+					"type"
+				]
+			}
+		},
+		"consumesObject": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"enum": [
+						"Superiority Dice",
+						"Ki",
+						"Channel Divinity",
+						"Psionic Energy Dice",
+						"Wild Shape",
+						"Sorcery Points",
+						"Arcane Shot"
+					]
+				},
+				"amount": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"additionalProperties": false
 		},
 		"dataDamageTags": {
 			"type": "string",
@@ -2781,6 +2890,9 @@
 				"string"
 			]
 		},
+		"basicRules": {
+			"type": "boolean"
+		},
 		"fluffObject": {
 			"type": "object",
 			"properties": {
@@ -3202,6 +3314,9 @@
 		},
 		"foundryDataObject": {
 			"type": "object"
+		},
+		"foundryImg": {
+			"type": "string"
 		},
 		"foundrySubEntitiesObject": {
 			"description": "A 5etools-data-like object of additional entities to import.",

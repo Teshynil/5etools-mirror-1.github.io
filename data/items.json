@@ -637,6 +637,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -755,6 +756,7 @@
 			"source": "PHB",
 			"page": 148,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -795,6 +797,7 @@
 			"page": 47,
 			"type": "OTH",
 			"rarity": "unknown",
+			"weight": 8,
 			"entries": [
 				"The stilts take 1 minute to put on or remove. They increase the height of any humanoid wearing them by 2 to 5 feet. Each stilt weighs 8 pounds and is 1 foot long when fully collapsed."
 			]
@@ -858,17 +861,17 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Piety 10+.",
+									"name": "Piety 10+",
 									"entry": "The hammer has 1 randomly determined {@table Artifact Properties; Minor Beneficial Properties|dmg|minor beneficial} property."
 								},
 								{
 									"type": "item",
-									"name": "Piety 25+.",
+									"name": "Piety 25+",
 									"entry": "The hammer has 1 randomly determined {@table Artifact Properties; Major Beneficial Properties|dmg|major beneficial} property."
 								},
 								{
 									"type": "item",
-									"name": "Piety 50+.",
+									"name": "Piety 50+",
 									"entry": "The hammer has 1 additional randomly determined {@table Artifact Properties; Major Beneficial Properties|dmg|major beneficial} property."
 								}
 							]
@@ -949,10 +952,26 @@
 			]
 		},
 		{
+			"name": "Alchemist's Doom",
+			"source": "SCC",
+			"page": 179,
+			"_copy": {
+				"name": "Alchemist's Fire (flask)",
+				"source": "PHB"
+			},
+			"type": "G",
+			"rarity": "unknown",
+			"value": null,
+			"entries": [
+				"This sticky, adhesive fluid ignites when exposed to air. As an action, you can throw this flask up to 20 feet, shattering it on impact. Make a ranged attack against a creature or object, treating the alchemist's fire as an improvised weapon. On a hit, the target takes 7 ({@dice 2d6}) fire damage at the start of each of its turns. A creature can end this damage by using its action to make a DC 10 Dexterity check to extinguish the flames."
+			]
+		},
+		{
 			"name": "Alchemist's Fire (flask)",
 			"source": "PHB",
 			"page": 148,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -965,6 +984,8 @@
 			"name": "Alchemist's Supplies",
 			"source": "PHB",
 			"page": 154,
+			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -1241,6 +1262,7 @@
 			"source": "PHB",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"type": "FD",
 			"rarity": "none",
 			"value": 20
@@ -1250,6 +1272,7 @@
 			"source": "PHB",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"type": "FD",
 			"rarity": "none",
 			"value": 4
@@ -1274,6 +1297,16 @@
 			"value": 10000,
 			"entries": [
 				"A transparent watery gold to rich gold gemstone."
+			]
+		},
+		{
+			"name": "Amber Runestone",
+			"source": "NRH-TLT",
+			"page": 6,
+			"rarity": "uncommon",
+			"wondrous": true,
+			"entries": [
+				"This piece of polished amber is engraved with many tiny runes. As a bonus action, you can mentally command the stone to shed bright light in a 15-foot radius and dim light for an additional 15 feet. The light is sunlight. While the light persists, you can also use a bonus action to expand or reduce its radius of bright and dim light by 5 feet each, to a maximum of 30 feet each or a minimum of 10 feet each."
 			]
 		},
 		{
@@ -1335,6 +1368,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "SCF",
 			"scfType": "holy",
 			"rarity": "none",
@@ -1350,10 +1384,32 @@
 			"value": 2500
 		},
 		{
+			"name": "Amulet of Harmony",
+			"source": "NRH-AT",
+			"page": 8,
+			"rarity": "legendary",
+			"reqAttune": true,
+			"wondrous": true,
+			"entries": [
+				"The amulet is a golden disk about 4 inches across. There are symbols etched into its surface and there are six bezels that hold the Gems of Power.",
+				"The Amulet of Harmony has the following properties:",
+				{
+					"type": "list",
+					"items": [
+						"While attuned to this amulet, you feel a pull in the direction of the Prismatic Well.",
+						"If the Prismatic Well is dormant, you can restore its power by expending your own energy. You must be within 10-feet of the well to restore its power and you must say the words, \"I invoke the power of the Prismatic Well and restore the colors of Harmony for all.\" If you do so, roll a {@dice d6}. On a 2-6, the power of the well is restored. On a 1, the well is restored but you fall into a deep, magical slumber for 1 year and cannot be roused except by a remove curse spell or similar magic.",
+						"You can turn off the power of the Prismatic Well, plunging all of Harmony into a polarized world where everything is horribly black and white. To do this, you must be within 10-feet of the well and you must say the words, \"I revoke the power of the Prismatic Well and withhold the colors of Harmony to all.\" If you do so, roll a {@dice d6}. On a 3-6, the well is turned off. On 1-2, the power of the well remains and you turn into a statue of black stone."
+					]
+				},
+				"Only a wish spell can undo this effect."
+			]
+		},
+		{
 			"name": "Amulet of Health",
 			"source": "DMG",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"tier": "major",
 			"rarity": "rare",
 			"reqAttune": true,
@@ -1513,6 +1569,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 5000,
@@ -1630,6 +1687,9 @@
 			],
 			"lootTables": [
 				"Magic Item Table I"
+			],
+			"seeAlsoVehicle": [
+				"Apparatus of Kwalish|DMG"
 			],
 			"hasFluffImages": true
 		},
@@ -1912,21 +1972,21 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Chromatic.",
+							"name": "Chromatic",
 							"entries": [
 								"Whenever you use a spell slot to cast a spell that deals acid, cold, fire, lightning, or poison damage, roll a {@dice d6}, and you gain a bonus equal to the number rolled to one of the spell's damage rolls."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Gem.",
+							"name": "Gem",
 							"entries": [
 								"Whenever you use a spell slot to cast a spell, you can immediately teleport to an unoccupied space you can see within 15 feet of you."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Metallic.",
+							"name": "Metallic",
 							"entries": [
 								"When a creature you can see within 30 feet of you makes a saving throw, you can use your reaction to give that creature advantage on the saving throw."
 							]
@@ -1940,21 +2000,21 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Chromatic.",
+							"name": "Chromatic",
 							"entries": [
 								"{@spell Hold monster}, {@spell Rime's binding ice|FTD}"
 							]
 						},
 						{
 							"type": "item",
-							"name": "Gem.",
+							"name": "Gem",
 							"entries": [
 								"{@spell Rary's telepathic bond}, {@spell Raulothim's psychic lance|FTD}"
 							]
 						},
 						{
 							"type": "item",
-							"name": "Metallic.",
+							"name": "Metallic",
 							"entries": [
 								"{@spell Fizban's platinum shield|FTD}, {@spell legend lore}"
 							]
@@ -2017,7 +2077,7 @@
 				"Sorcerer"
 			],
 			"entries": [
-				"This crystal is a solidified shard of the Astral Plane, swirling with silver mist. As an action, you can attach the shard to a Tiny object (such as a weapon or a piece of jewelry) or detach it. It falls off if your attunement to it ends. You can use the shard as a spellcasting focus for your sorcerer spells while you hold or wear it.",
+				"This crystal is a solidified shard of the Astral Plane, swirling with silver mist. As an action, you can attach the shard to a Tiny object (such as a weapon or a piece of jewelry) or detach it. It falls off if your attunement to it ends. You can use the shard as a spellcasting focus while you hold or wear it.",
 				"When you use a Metamagic option on a spell while you are holding or wearing the shard, immediately after casting the spell you can teleport to an unoccupied space you can see within 30 feet of you."
 			]
 		},
@@ -2434,6 +2494,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -2622,6 +2683,7 @@
 			"source": "DMG",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"tier": "minor",
 			"rarity": "uncommon",
 			"wondrous": true,
@@ -2840,6 +2902,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 6,
@@ -2864,6 +2927,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 0.002,
@@ -2877,6 +2941,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -2987,6 +3052,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 70,
@@ -3365,6 +3431,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 10000,
@@ -3378,6 +3445,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -3467,6 +3535,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 7,
@@ -3535,6 +3604,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 100
@@ -3759,6 +3829,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"weight": 1,
@@ -4322,6 +4393,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 3,
@@ -4375,6 +4447,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -4770,6 +4843,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -5055,6 +5129,7 @@
 			"source": "DMG",
 			"page": 156,
 			"srd": true,
+			"basicRules": true,
 			"tier": "major",
 			"rarity": "uncommon",
 			"reqAttune": true,
@@ -5137,6 +5212,17 @@
 				"At the end of the duration, the creature reverts to its keyrune form. It reverts early if it drops to 0 hit points or if you use an action to speak the command word again while touching it. When the creature reverts to its keyrune form, it can't transform again until 36 hours have passed."
 			],
 			"hasFluffImages": true
+		},
+		{
+			"name": "Bottle of Boundless Coffee",
+			"source": "SCC",
+			"page": 38,
+			"rarity": "common",
+			"wondrous": true,
+			"entries": [
+				"This metal bottle carries delicious, warm coffee. The bottle comes with a stopper, which is attached to the bottle by a little chain. Even when open, the bottle won't accept any liquid other than the coffee it produces. The coffee inside is always comfortably warm, and none of the heat can be felt through the bottle.",
+				"Each time you drink the coffee, roll a {@dice d20}. On a 1, the bottle refuses to dispense coffee for the next hour. If you pour coffee from the bottle, rather than drinking from it, the coffee vanishes the moment it leaves the bottle."
+			]
 		},
 		{
 			"name": "Bottle stopper cork embossed with gold leaf and set with amethysts",
@@ -5328,6 +5414,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -5509,6 +5596,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -5522,6 +5610,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -5535,6 +5624,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 44.5,
@@ -5632,6 +5722,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -5709,6 +5800,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 0.1,
@@ -5722,6 +5814,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -5742,6 +5835,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 5000,
@@ -5753,6 +5847,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 1,
@@ -5881,6 +5976,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 10
@@ -5935,6 +6031,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -6085,6 +6182,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "VEH",
 			"rarity": "none",
 			"weight": 600,
@@ -6111,6 +6209,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "VEH",
 			"rarity": "none",
 			"weight": 200,
@@ -6191,6 +6290,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -6303,6 +6403,17 @@
 			"value": 25000
 		},
 		{
+			"name": "Catapult Munition",
+			"source": "SCC",
+			"page": 174,
+			"type": "G",
+			"rarity": "unknown",
+			"entries": [
+				"A catapult munition roughly the size and weight of a cannonball.",
+				"The munition can be thrown up to 30 feet and explodes on impact. Any creature within a 15-foot-radius sphere centered on the point of impact must make a DC 14 Dexterity saving throw, taking 35 ({@damage 10d6}) fire damage on a failed save, or half as much damage on a successful one. In addition, each object in that area that isn't being worn or carried takes 35 ({@damage 10d6}) fire damage."
+			]
+		},
+		{
 			"name": "Cauldron of Plenty",
 			"source": "IDRotF",
 			"page": 314,
@@ -6332,7 +6443,7 @@
 			"wondrous": true,
 			"weight": 0.01,
 			"entries": [
-				"This Tiny pot bears relief scenes of heroes on its cast iron sides. You can use the cauldron as a spellcasting focus for your druid spells, and it functions as a suitable component for the {@spell scrying} spell. When you finish a long rest, you can use the cauldron to create a {@item potion of greater healing}. The potion lasts for 24 hours, then loses its magic if not consumed.",
+				"This Tiny pot bears relief scenes of heroes on its cast iron sides. You can use the cauldron as a spellcasting focus for your spells, and it functions as a suitable component for the {@spell scrying} spell. When you finish a long rest, you can use the cauldron to create a {@item potion of greater healing}. The potion lasts for 24 hours, then loses its magic if not consumed.",
 				"As an action, you can cause the cauldron to grow large enough for a Medium creature to crouch within. You can revert the cauldron to its normal size as an action, harmlessly shunting anything that can't fit inside to the nearest unoccupied space.",
 				"If you place the corpse of a humanoid into the cauldron and cover the corpse with 200 pounds of salt (which costs 10 gp) for at least 8 hours, the salt is consumed and the creature returns to life as if by {@spell raise dead} at the next dawn. Once used, this property can't be used again for 7 days."
 			],
@@ -6384,6 +6495,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 10,
@@ -6408,6 +6520,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 1
@@ -6416,10 +6529,38 @@
 			"name": "Chariot",
 			"source": "PHB",
 			"page": 157,
+			"srd": true,
+			"basicRules": true,
+			"additionalSources": [
+				{
+					"source": "MOT",
+					"page": 196
+				}
+			],
 			"type": "VEH",
 			"rarity": "none",
 			"weight": 100,
-			"value": 25000
+			"value": 25000,
+			"additionalEntries": [
+				{
+					"type": "inset",
+					"name": "Chariots",
+					"source": "MOT",
+					"page": 196,
+					"entries": [
+						"Chariots and the creatures pulling them work like controlled mounts, as described in the mounted combat rules in the {@book Player's Handbook|PHB|9|Mounted Combat}, but with the following differences:",
+						{
+							"type": "list",
+							"items": [
+								"Mounting or dismounting a chariot costs you 5 feet of movement, rather than a number of feet equal to half your speed.",
+								"Being mounted on a chariot grants you half cover.",
+								"A chariot's speed is equal to the speed of the slowest creature pulling it.",
+								"If multiple creatures are pulling the chariot, they all act on the same initiative, and they must take the same action on their turn."
+							]
+						}
+					]
+				}
+			]
 		},
 		{
 			"name": "Charlatan's Die",
@@ -6470,6 +6611,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 25,
@@ -6499,6 +6641,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 2
@@ -6624,6 +6767,7 @@
 			"source": "PHB",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"type": "FD",
 			"rarity": "none",
 			"value": 30
@@ -6633,6 +6777,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -6764,6 +6909,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 12,
@@ -6842,6 +6988,7 @@
 			"source": "DMG",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"tier": "major",
 			"rarity": "uncommon",
 			"reqAttune": true,
@@ -7010,6 +7157,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -7020,6 +7168,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -7218,6 +7367,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 3,
@@ -7244,6 +7394,7 @@
 			"source": "PHB",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"type": "FD",
 			"rarity": "none",
 			"value": 20
@@ -7253,6 +7404,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -7306,6 +7458,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -7390,6 +7543,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -7483,6 +7637,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 4,
@@ -7493,6 +7648,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 50
@@ -7502,6 +7658,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 1000
@@ -7655,6 +7812,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -7675,6 +7833,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -7943,6 +8102,17 @@
 				"Magic Item Table I"
 			],
 			"hasFluffImages": true
+		},
+		{
+			"name": "Cuddly Strixhaven Mascot",
+			"source": "SCC",
+			"page": 38,
+			"rarity": "common",
+			"wondrous": true,
+			"entries": [
+				"Representing one of the mascots of Strixhaven, this soft, Tiny, magic toy is perfect for cuddling. If you press it to your arm, shoulder, or leg as an action, the toy stays attached there for 1 hour or until you use an action to remove it.",
+				"The toy can also be used to fight off fear. When you make a saving throw to avoid or end the {@condition frightened} condition on yourself, you can give yourself advantage on the roll if the toy is on your person. You must decide to do so before rolling the {@dice d20}. If the save succeeds, you can't use the toy in this way until you finish a long rest."
+			]
 		},
 		{
 			"name": "Cursed Luckstone",
@@ -9490,17 +9660,17 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Piety 10+.",
+									"name": "Piety 10+",
 									"entry": "You can breathe underwater, and you gain a swimming speed of 60 feet."
 								},
 								{
 									"type": "item",
-									"name": "Piety 25+.",
+									"name": "Piety 25+",
 									"entry": "The bident has 1 randomly determined {@table Artifact Properties; Minor Beneficial Properties|dmg|minor beneficial} property."
 								},
 								{
 									"type": "item",
-									"name": "Piety 50+.",
+									"name": "Piety 50+",
 									"entry": "The bident has 1 randomly determined {@table Artifact Properties; Major Beneficial Properties|dmg|major beneficial} property."
 								}
 							]
@@ -9790,6 +9960,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "GS",
 			"rarity": "none",
 			"value": 10
@@ -9887,6 +10058,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 36,
@@ -9938,6 +10110,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -10192,6 +10365,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 800,
@@ -10249,6 +10423,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 5000,
@@ -10322,6 +10497,7 @@
 			"name": "Dragonchess Set",
 			"source": "PHB",
 			"page": 154,
+			"basicRules": true,
 			"type": "GS",
 			"rarity": "none",
 			"weight": 0.5,
@@ -10551,6 +10727,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 3,
@@ -10561,6 +10738,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 10,
@@ -10571,6 +10749,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 61.5,
@@ -11367,6 +11546,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 20000,
@@ -11466,6 +11646,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "SCF",
 			"scfType": "holy",
 			"rarity": "none",
@@ -11551,6 +11732,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 38,
@@ -11629,12 +11811,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Piety 10+.",
+									"name": "Piety 10+",
 									"entry": "The bow has 1 randomly determined {@table Artifact Properties; Minor Beneficial Properties|dmg|minor beneficial} property."
 								},
 								{
 									"type": "item",
-									"name": "Piety 25+.",
+									"name": "Piety 25+",
 									"entry": "The bow has 1 randomly determined {@table Artifact Properties; Major Beneficial Properties|dmg|major beneficial} property."
 								}
 							]
@@ -11766,6 +11948,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"weight": 40,
@@ -11779,6 +11962,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 59,
@@ -12162,6 +12346,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"weight": 10,
@@ -12840,6 +13025,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 6,
@@ -12882,6 +13068,7 @@
 			"source": "PHB",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"type": "FD",
 			"rarity": "none",
 			"value": 1000
@@ -12927,6 +13114,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 4,
@@ -12982,6 +13170,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -13047,6 +13236,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -13057,6 +13247,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 1,
@@ -13134,6 +13325,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -13299,6 +13491,8 @@
 			"name": "Galley",
 			"source": "DMG",
 			"page": 119,
+			"srd": true,
+			"basicRules": true,
 			"type": "SHP",
 			"rarity": "none",
 			"value": 3000000,
@@ -13307,7 +13501,10 @@
 			"vehHp": 500,
 			"vehDmgThresh": 20,
 			"vehSpeed": 4,
-			"capCargo": 150
+			"capCargo": 150,
+			"seeAlsoVehicle": [
+				"Galley"
+			]
 		},
 		{
 			"name": "Garnet",
@@ -13336,6 +13533,7 @@
 			"source": "DMG",
 			"page": 171,
 			"srd": true,
+			"basicRules": true,
 			"tier": "major",
 			"rarity": "uncommon",
 			"reqAttune": true,
@@ -13527,6 +13725,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -13555,6 +13754,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -13568,6 +13768,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -13681,6 +13882,7 @@
 			"source": "DMG",
 			"page": 172,
 			"srd": true,
+			"basicRules": true,
 			"tier": "major",
 			"rarity": "uncommon",
 			"reqAttune": true,
@@ -13730,6 +13932,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 100
@@ -13739,6 +13942,7 @@
 			"source": "DMG",
 			"page": 172,
 			"srd": true,
+			"basicRules": true,
 			"tier": "minor",
 			"rarity": "uncommon",
 			"wondrous": true,
@@ -13770,6 +13974,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -13794,7 +13999,7 @@
 			"hasFluffImages": true
 		},
 		{
-			"name": "Gold 5-Zib Coin",
+			"name": "Gold 5-Zino Coin",
 			"source": "GGR",
 			"page": 9,
 			"type": "$",
@@ -14044,6 +14249,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 4,
@@ -14548,6 +14754,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 3,
@@ -14835,6 +15042,7 @@
 			"source": "DMG",
 			"page": 173,
 			"srd": true,
+			"basicRules": true,
 			"tier": "major",
 			"rarity": "uncommon",
 			"reqAttune": true,
@@ -14857,6 +15065,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 3,
@@ -15243,6 +15452,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 10,
@@ -15256,6 +15466,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -15546,6 +15757,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -15560,6 +15772,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -15619,6 +15832,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 2,
@@ -16211,6 +16425,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -16221,6 +16436,7 @@
 			"source": "PHB",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"type": "FD",
 			"rarity": "none",
 			"value": 10
@@ -16249,6 +16465,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 25,
@@ -16492,7 +16709,7 @@
 							"items": [
 								"You can use an action to scream into the empty cauldron, which magically summons a {@creature swarm of bats} that flies out of the cauldron and acts immediately after you in the initiative order. The swarm obeys your commands and disappears after 1 minute if it hasn't been destroyed by then. Once used, this property of the cauldron can't be used again until the next dawn.",
 								"If at least 1 gallon of blood is poured into the cauldron and stirred for 1 minute, it turns into a cloud of harmless black smoke that erupts from the cauldron and dissipates quickly. At the same time, all Humanoid creatures within a certain radius of the cauldron fall {@condition unconscious} for 1 hour, except those that are attuned to the cauldron or immune to being {@condition charmed}. The radius of the effect is 100 feet per gallon of blood used. An {@condition unconscious} creature awakens if it takes damage or if someone uses an action to shake or slap it. Once used, this property of the cauldron can't be used again until the next dawn.",
-								"Tying a dead frog or toad to the end of an ordinary branch and dipping it in the water-filled cauldron transforms the branch into a wand of polymorph with 3 charges. This wand can't recharge and crumbles to ashes when its final charge is expended. Once used, this property of the cauldron can't be used again for 8 days.",
+								"Tying a dead frog or toad to the end of an ordinary branch and dipping it in the water-filled cauldron transforms the branch into a {@item wand of polymorph} with 3 charges. This wand can't recharge and crumbles to ashes when its final charge is expended. Once used, this property of the cauldron can't be used again for 8 days.",
 								"If you spend 1 minute touching the cauldron with a unicorn's horn while reciting the poem called \"The Witch Queen's Cauldron\" (see the accompanying sidebar), all creatures within 1,000 feet of the cauldron except those that are attuned to it become frozen in time. A time-frozen creature is {@condition incapacitated}, can't move or speak, doesn't age, and is unaware of its surroundings or the passage of time. Moreover, it can't be moved, harmed in any way, or affected by any other magic. All other conditions and effects on the creature are suppressed until it is no longer frozen in time. Destroying the cauldron, sending it to another plane of existence, or touching it with a unicorn's horn for 1 minute while reciting \"The Witch Queen's Cauldron\" ends the time-freezing effect on all creatures. The effect also ends on any creature that comes into contact with an antimagic field or is touched by a unicorn's horn."
 							]
 						}
@@ -16638,6 +16855,10 @@
 				{
 					"source": "BGDIA",
 					"page": 224
+				},
+				{
+					"source": "MPMM",
+					"page": 190
 				}
 			],
 			"rarity": "legendary",
@@ -16651,9 +16872,9 @@
 			],
 			"wondrous": true,
 			"entries": [
-				"A {@creature narzugon|MTF} binds a nightmare to its service with infernal tack, which consists of a bridle, bit, reins, saddle, stirrups, and spurs. A {@creature nightmare} equipped with infernal tack must serve whoever wears the spurs until the wearer dies or the tack is removed.",
-				"You can use an action to call a {@creature nightmare} equipped with infernal tack by clashing the spurs together or scraping them through blood. The nightmare appears at the start of your next turn, within 20 feet of you. It acts as your ally and takes its turn on your initiative count. It remains for 1 day, until you or it dies, or until you dismiss it as an action. If the nightmare dies, it reforms in the Nine Hells within 24 hours, after which you can summon it again.",
-				"The tack doesn't conjure a nightmare from thin air; one must first be subdued so the tack can be placed on it. No nightmare accepts this forced servitude willingly, but some eventually form strong loyalties to their masters and become true partners in evil."
+				"A rider binds a {@creature nightmare} to its service with infernal tack, which consists of a bridle, bit, reins, saddle, and stirrups, along with spurs that are worn by the rider. A nightmare equipped with infernal tack must serve whoever wears the spurs until the wearer dies or the tack is removed.",
+				"You can use an action to call a nightmare equipped with infernal tack by clashing the spurs together or scraping them through blood. The nightmare appears at the start of your next turn, within 20 feet of you. It acts as your ally and takes its turn on your initiative count. It remains for 1 day, until you or it dies, or until you dismiss it as an action. If the nightmare dies, it reforms in the Nine Hells within 24 hours, after which you can summon it again.",
+				"The tack doesn't conjure a nightmare; one must first be subdued so the tack can be placed on it. No nightmare accepts this forced servitude willingly, but some eventually form strong loyalties to their masters and become true partners in evil."
 			]
 		},
 		{
@@ -16756,12 +16977,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Shield.",
+									"name": "Shield",
 									"entry": "The shield is now a rare magic item that requires attunement. Its magic gives you a +1 bonus to AC, and the first time after each of your long rests that damage reduces you to 0 hit points, you are instead reduced to 1 hit point. You must be wielding the shield to gain these benefits."
 								},
 								{
 									"type": "item",
-									"name": "Weapon.",
+									"name": "Weapon",
 									"entry": "The weapon is now an uncommon magic weapon. It grants you a +1 bonus to AC while you're holding it."
 								}
 							]
@@ -16775,6 +16996,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 1000,
@@ -16787,6 +17009,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 2
@@ -17508,6 +17731,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -17690,6 +17914,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 10,
@@ -17703,6 +17928,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 0.5,
@@ -17713,6 +17939,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -18064,6 +18291,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -18133,6 +18361,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 4,
@@ -18168,6 +18397,8 @@
 			"name": "Keelboat",
 			"source": "DMG",
 			"page": 119,
+			"srd": true,
+			"basicRules": true,
 			"type": "SHP",
 			"rarity": "none",
 			"value": 300000,
@@ -18180,6 +18411,9 @@
 			"capCargo": 0.5,
 			"entries": [
 				"Keelboats and rowboats are used on lakes and rivers. If going downstream, add the speed of the current (typically 3 miles per hour) to the speed of the vehicle. These vehicles can't be rowed against any significant current, but they can be pulled upstream by draft animals on the shores."
+			],
+			"seeAlsoVehicle": [
+				"Keelboat"
 			]
 		},
 		{
@@ -18187,6 +18421,7 @@
 			"source": "DMG",
 			"page": 179,
 			"srd": "Restorative Ointment",
+			"basicRules": true,
 			"tier": "minor",
 			"rarity": "uncommon",
 			"wondrous": true,
@@ -18371,22 +18606,22 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Piety 3+.",
+									"name": "Piety 3+",
 									"entry": "You gain 15 temporary hit points each dawn."
 								},
 								{
 									"type": "item",
-									"name": "Piety 10+.",
+									"name": "Piety 10+",
 									"entry": "The spear has 1 randomly determined {@table Artifact Properties; Minor Beneficial Properties|dmg|minor beneficial} property."
 								},
 								{
 									"type": "item",
-									"name": "Piety 25+.",
+									"name": "Piety 25+",
 									"entry": "The spear has 1 additional randomly determined {@table Artifact Properties; Minor Beneficial Properties|dmg|minor beneficial} property."
 								},
 								{
 									"type": "item",
-									"name": "Piety 50+.",
+									"name": "Piety 50+",
 									"entry": "The spear has 1 randomly determined {@table Artifact Properties; Major Beneficial Properties|dmg|major beneficial} property."
 								}
 							]
@@ -18539,6 +18774,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 25,
@@ -18552,6 +18788,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -18746,12 +18983,12 @@
 									"items": [
 										{
 											"type": "item",
-											"name": "Dead Eyes.",
+											"name": "Dead Eyes",
 											"entry": "A creature that fails the saving throw against this poison is {@condition poisoned} for 1 hour. While {@condition poisoned} in this way, the creature is {@condition blinded}."
 										},
 										{
 											"type": "item",
-											"name": "Serpent Venom.",
+											"name": "Serpent Venom",
 											"entry": "A creature that fails the saving throw against this poison takes {@damage 3d6} poison damage, or half as much damage on a successful save."
 										}
 									]
@@ -18870,6 +19107,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -19079,6 +19317,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 500
@@ -19238,6 +19477,7 @@
 			"source": "PHB",
 			"page": 158,
 			"srd": true,
+			"basicRules": true,
 			"type": "FD",
 			"rarity": "none",
 			"value": 2
@@ -19247,6 +19487,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -19280,6 +19521,8 @@
 			"name": "Longship",
 			"source": "DMG",
 			"page": 119,
+			"srd": true,
+			"basicRules": true,
 			"type": "SHP",
 			"rarity": "none",
 			"value": 1000000,
@@ -19289,7 +19532,10 @@
 			"vehDmgThresh": 15,
 			"vehSpeed": 3,
 			"capPassenger": 150,
-			"capCargo": 10
+			"capCargo": 10,
+			"seeAlsoVehicle": [
+				"Longship"
+			]
 		},
 		{
 			"name": "Lord's Ensemble",
@@ -19328,6 +19574,25 @@
 				}
 			],
 			"hasFluffImages": true
+		},
+		{
+			"name": "Lorehold Primer",
+			"source": "SCC",
+			"page": 39,
+			"rarity": "uncommon",
+			"reqAttune": "by a spellcaster",
+			"reqAttuneTags": [
+				{
+					"spellcasting": true
+				}
+			],
+			"wondrous": true,
+			"recharge": "dawn",
+			"charges": 3,
+			"entries": [
+				"The Lorehold Primer is a magic textbook created at Strixhaven's Lorehold College. The primer has 3 charges, and it regains {@dice 1d3} expended charges daily at dawn. If you make an Intelligence ({@skill History}) or Intelligence ({@skill Religion}) check while holding the primer, you can expend 1 charge to give yourself {@dice 1d4} bonus to the check, immediately after you roll the {@dice d20}.",
+				"In addition, if you study the primer at the end of a long rest, you can choose one 1st-level spell from the cleric or wizard spell list. Before you finish your next long rest, you can cast the chosen spell once without a spell slot if you are holding the primer. Your spellcasting ability for this spell is your choice of Intelligence, Wisdom, or Charisma."
+			]
 		},
 		{
 			"name": "Lost Crown of Besilmer",
@@ -19437,12 +19702,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Weal.",
+									"name": "Weal",
 									"entry": "The creature has advantage on attack rolls, ability checks, and saving throws for the next hour."
 								},
 								{
 									"type": "item",
-									"name": "Woe.",
+									"name": "Woe",
 									"entry": "The creature has disadvantage on attack rolls, ability checks, and saving throws for the next hour."
 								},
 								"The deck can be used in this way twice, and you regain all expended uses at the next dawn."
@@ -19588,6 +19853,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 2,
@@ -19633,6 +19899,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 2,
@@ -19872,6 +20139,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 10000,
@@ -19911,6 +20179,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 6,
@@ -20061,6 +20330,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -20120,6 +20390,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -20189,6 +20460,19 @@
 						]
 					]
 				}
+			]
+		},
+		{
+			"name": "Masque Charm",
+			"source": "SCC",
+			"page": 127,
+			"rarity": "common",
+			"wondrous": true,
+			"entries": [
+				"A masque charm is a small silver pin. While wearing this charm, you can use an action to cast the {@spell disguise self} spell (DC 13 to discern the disguise). Once the spell is cast, it can't be cast from the charm again until the next sunset. When casting the spell, you can have the spell last for its normal 1 hour duration or for 6 hours. If you choose the 6-hour duration, the charm becomes nonmagical when the spell ends. In either case, the spell ends if the charm is removed from you."
+			],
+			"attachedSpells": [
+				"disguise self"
 			]
 		},
 		{
@@ -20283,6 +20567,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 2500,
@@ -20328,17 +20613,17 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Piety 1+.",
+									"name": "Piety 1+",
 									"entry": "The whip has 1 randomly determined {@table Artifact Properties; Minor Detrimental Properties|dmg|minor detrimental} property\u2014a burden Erebos imposes to test his faithful."
 								},
 								{
 									"type": "item",
-									"name": "Piety 25+.",
+									"name": "Piety 25+",
 									"entry": "The whip has 1 randomly determined {@table Artifact Properties; Major Beneficial Properties|dmg|major beneficial} property."
 								},
 								{
 									"type": "item",
-									"name": "Piety 50+.",
+									"name": "Piety 50+",
 									"entry": "The whip has 1 additional randomly determined {@table Artifact Properties; Major Beneficial Properties|dmg|major beneficial} property."
 								}
 							]
@@ -20441,6 +20726,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 3,
@@ -20454,6 +20740,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -20551,6 +20838,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"weight": 30,
@@ -20592,6 +20880,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 10,
@@ -20867,12 +21156,12 @@
 		},
 		{
 			"name": "Monster Hunter's Pack",
-			"source": "CoS",
-			"page": 209,
+			"source": "VRGR",
+			"page": 34,
 			"otherSources": [
 				{
-					"source": "VRGR",
-					"page": 34
+					"source": "CoS",
+					"page": 209
 				}
 			],
 			"type": "G",
@@ -21094,6 +21383,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 800,
@@ -21108,6 +21398,83 @@
 			"rarity": "uncommon",
 			"entries": [
 				"White dust swirls constantly within this pale gray potion. When you drink the potion, it cures you of mummy rot."
+			]
+		},
+		{
+			"name": "Murgaxor's Elixir of Life",
+			"source": "SCC",
+			"page": 179,
+			"type": "G",
+			"rarity": "unknown",
+			"entries": [
+				"Whoever drinks this concoction gains advantage on death saving throws for 24 hours."
+			]
+		},
+		{
+			"name": "Murgaxor's Orb",
+			"source": "SCC",
+			"page": 126,
+			"rarity": "legendary",
+			"reqAttune": true,
+			"wondrous": true,
+			"curse": true,
+			"sentient": true,
+			"entries": [
+				"Roiling green mist fills this glass orb, which the exiled Strixhaven mage {@creature Murgaxor|SCC} once used in foul magical experiments. Murgaxor's spirit has infused the orb, which he uses to spread a terrible curse among Strixhaven's students.",
+				{
+					"type": "entries",
+					"name": "Sentience",
+					"entries": [
+						"Murgaxor's orb is a sentient, chaotic evil magic item with the following properties:",
+						{
+							"type": "list",
+							"items": [
+								"The orb has an Intelligence of 20, a Wisdom of 16, and a Charisma of 16, as well as hearing and {@sense darkvision} out to a range of 30 feet.",
+								"The orb can speak, read, and understand Common, and it can communicate telepathically with any creature touching it.",
+								"At any time during your turn, the orb can cast the {@spell suggestion} spell (save DC 17), targeting you or one other creature that touched the orb within the last 24 hours. This isn't a power of the orb that you control."
+							]
+						}
+					]
+				},
+				{
+					"type": "entries",
+					"name": "Curse",
+					"entries": [
+						"Any Humanoid you touch while holding the orb must succeed on a DC 10 Wisdom saving throw or become cursed. Each creature cursed by the orb bears an echo of Murgaxor's hateful thoughts, and that creature suffers from headaches that are persistent but not debilitating until the curse ends. On your turn, the orb can use an action to produce one of the following effects, targeting one or more creatures it has cursed:"
+					]
+				},
+				{
+					"type": "entries",
+					"name": "Unconsciousness",
+					"entries": [
+						"The cursed creature falls {@condition unconscious} for 1 hour. The creature is roused if it takes damage or someone uses an action to shake or slap it awake."
+					]
+				},
+				{
+					"type": "entries",
+					"name": "Visions of Terror",
+					"entries": [
+						"The cursed creature sees terrifying visions, causing it to view all creatures that aren't also cursed as dangerous monsters for 10 minutes. The cursed creature must use its action each round to make one attack against the nearest non-cursed creature. If the cursed creature has multiple possible targets, it attacks one at random. This effect ends if the cursed creature is {@condition incapacitated}.",
+						"After either of these effects ends, the affected creature is no longer cursed. The curse can also be removed from a creature with a {@spell remove curse} spell or similar magic. All cases of the curse end if Murgaxor's orb is destroyed."
+					]
+				},
+				{
+					"type": "entries",
+					"name": "Magical Signature",
+					"entries": [
+						"As a side effect of the orb's curse, the spell {@spell detect magic} reveals an aura of enchantment surrounding creatures bearing the curse. This aura is distinctive, but in a way {@spell detect magic} offers no further details about."
+					]
+				},
+				{
+					"type": "entries",
+					"name": "Destroying the Orb",
+					"entries": [
+						"Murgaxor's orb has AC 18; 20 hit points; immunity to necrotic, poison, and psychic damage; and resistance to all other types of damage. If reduced to 0 hit points, the orb shatters."
+					]
+				}
+			],
+			"attachedSpells": [
+				"suggestion"
 			]
 		},
 		{
@@ -21183,6 +21550,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -21752,6 +22120,7 @@
 			"source": "PHB",
 			"page": 152,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -21914,12 +22283,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Weapon.",
+									"name": "Weapon",
 									"entry": "The weapon is now an uncommon magic weapon. It deals an extra {@damage 1d6} fire damage to any target it hits."
 								},
 								{
 									"type": "item",
-									"name": "Armor.",
+									"name": "Armor",
 									"entry": "The armor is now a rare magic item that requires attunement. You have resistance to cold damage while wearing the armor."
 								}
 							]
@@ -22116,12 +22485,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Shield.",
+									"name": "Shield",
 									"entry": "The shield is now a rare magic item that requires attunement. While you wield it, you have resistance to all damage dealt by ranged weapon attacks."
 								},
 								{
 									"type": "item",
-									"name": "Boots.",
+									"name": "Boots",
 									"entry": "The pair of boots is now an uncommon magic item that requires attunement. While you wear the boots, you have advantage on Strength saving throws, and you can use your reaction to avoid being knocked {@condition prone}."
 								}
 							]
@@ -22663,6 +23032,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 1500
@@ -22672,6 +23042,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"weight": 15,
@@ -22698,6 +23069,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -22799,6 +23171,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 2,
@@ -22809,6 +23182,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 20
@@ -22838,6 +23212,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 10
@@ -22975,12 +23350,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Armor.",
+									"name": "Armor",
 									"entry": "The armor is now an uncommon magic item that requires attunement. You gain a bonus to speed of 5 feet while you wear the armor, and if it normally imposes disadvantage on {@skill Stealth} checks, it no longer does so."
 								},
 								{
 									"type": "item",
-									"name": "Boots/Cloak.",
+									"name": "Boots/Cloak",
 									"entry": "The pair of boots or cloak is now a rare magic item that requires attunement. While wearing the item, you can convert up to 20 feet of your movement on each of your turns into flight. If you don't land at the end of this flight, you fall unless you have another means of staying aloft. You can also cast {@spell feather fall} once from the item, and you regain the ability to do so when you finish a short or long rest."
 								}
 							]
@@ -23053,6 +23428,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -23080,6 +23456,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 500
@@ -23231,6 +23608,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 300
@@ -23314,6 +23692,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 4,
@@ -23327,6 +23706,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 0.25,
@@ -23491,6 +23871,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -23602,6 +23983,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "GS",
 			"rarity": "none",
 			"value": 50
@@ -23628,6 +24010,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -23715,6 +24098,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 7,
@@ -23748,6 +24132,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 3000,
@@ -23778,6 +24163,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 35,
@@ -23899,17 +24285,17 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Liquid Movement.",
+							"name": "Liquid Movement",
 							"entry": "You have a swimming speed of 30 feet. You can move over or through other liquids. You can enter and occupy the space of another creature. You can rise up to your normal height, and you can pass through even Tiny openings. You extinguish nonmagical flames in any space you enter."
 						},
 						{
 							"type": "item",
-							"name": "Watery Resilience.",
+							"name": "Watery Resilience",
 							"entry": "You have resistance to nonmagical damage. You also have advantage on Strength, Dexterity, and Constitution saving throws."
 						},
 						{
 							"type": "item",
-							"name": "Limitations.",
+							"name": "Limitations",
 							"entry": "You can't talk, attack, cast spells, or activate magic items. Any objects you were carrying or wearing meld into your new form and are inaccessible, though you continue to be affected by anything you're wearing, such as armor."
 						}
 					]
@@ -24085,6 +24471,7 @@
 			"source": "DMG",
 			"page": 187,
 			"srd": true,
+			"basicRules": true,
 			"type": "P",
 			"tier": "minor",
 			"rarity": "very rare",
@@ -24268,6 +24655,7 @@
 			"source": "DMG",
 			"page": 188,
 			"srd": true,
+			"basicRules": true,
 			"type": "P",
 			"tier": "minor",
 			"rarity": "very rare",
@@ -24510,7 +24898,7 @@
 			"tier": "minor",
 			"rarity": "very rare",
 			"entries": [
-				"When you drink this potion, you gain the effect of the {@spell haste} spell for 1 minute (no concentration required). The potion's yellow fluid is streaked with black and swirl on its own."
+				"When you drink this potion, you gain the effect of the {@spell haste} spell for 1 minute (no concentration required). The potion's yellow fluid is streaked with black and swirls on its own."
 			],
 			"attachedSpells": [
 				"haste"
@@ -24612,6 +25000,7 @@
 			"name": "Potion of Vitality",
 			"source": "DMG",
 			"page": 188,
+			"basicRules": true,
 			"type": "P",
 			"tier": "minor",
 			"rarity": "very rare",
@@ -24652,6 +25041,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -24725,6 +25115,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -24861,6 +25252,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 24,
@@ -24918,6 +25310,35 @@
 			"rarity": "unknown (magic)",
 			"entries": [
 				"This beaded jade necklace bears an ancient symbol of the River Heralds. When worn, the primal amulet allows its wearer to cast {@spell speak with animals}, {@spell locate object}, and {@spell pass without trace}. Once the amulet has been used to cast a spell, it can't be used to cast that spell again until the next dawn."
+			]
+		},
+		{
+			"name": "Prismari Primer",
+			"source": "SCC",
+			"page": 39,
+			"rarity": "uncommon",
+			"reqAttune": "by a spellcaster",
+			"reqAttuneTags": [
+				{
+					"spellcasting": true
+				}
+			],
+			"wondrous": true,
+			"recharge": "dawn",
+			"charges": 3,
+			"entries": [
+				"The Prismari Primer is a magic textbook created at Strixhaven's Prismari College. The primer has 3 charges, and it regains {@dice 1d3} expended charges daily at dawn. If you make a Dexterity ({@skill Acrobatics}) or a Charisma ({@skill Performance}) check while holding the primer, you can expend 1 charge to give yourself a {@dice 1d4} bonus to the check, immediately after you roll the {@dice d20}.",
+				"In addition, if you study the primer at the end of a long rest, you can choose one 1st-level spell from the bard or sorcerer spell list. Before you finish your next long rest, you can cast the chosen spell once without a spell slot if you are holding the primer. Your spellcasting ability for this spell is your choice of Intelligence, Wisdom, or Charisma."
+			]
+		},
+		{
+			"name": "Prismatic Well",
+			"source": "NRH-AT",
+			"page": 8,
+			"rarity": "legendary",
+			"wondrous": true,
+			"entries": [
+				"This well enhances the colors of the city of Harmony and invigorates the population. When the well is at full power, all good-aligned creatures that see the colors experience feelings of happiness and have advantage on all Charisma checks."
 			]
 		},
 		{
@@ -25332,6 +25753,25 @@
 			]
 		},
 		{
+			"name": "Quandrix Primer",
+			"source": "SCC",
+			"page": 39,
+			"rarity": "uncommon",
+			"reqAttune": "by a spellcaster",
+			"reqAttuneTags": [
+				{
+					"spellcasting": true
+				}
+			],
+			"wondrous": true,
+			"recharge": "dawn",
+			"charges": 3,
+			"entries": [
+				"The Quandrix Primer is a magic textbook created at Strixhaven's Quandrix College. The primer has 3 charges, and it regains {@dice 1d3} expended charges daily at dawn. If you make an Intelligence ({@skill Arcana}) or an Intelligence ({@skill Nature}) check while holding the primer, you can expend 1 charge to give yourself a {@dice 1d4} bonus to the check, immediately after you roll the {@dice d20}.",
+				"In addition, if you study the primer at the end of a long rest, you can choose one 1st-level spell from the druid or wizard spell list. Before you finish your next long rest, you can cast the chosen spell once without a spell slot if you are holding the primer. Your spellcasting ability for this spell is your choice of Intelligence, Wisdom, or Charisma."
+			]
+		},
+		{
 			"name": "Quartz",
 			"source": "DMG",
 			"page": 134,
@@ -25347,6 +25787,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -25529,6 +25970,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 2,
@@ -25656,6 +26098,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "SCF",
 			"scfType": "holy",
 			"rarity": "none",
@@ -25722,6 +26165,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 7500,
@@ -25733,6 +26177,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"weight": 25,
@@ -25743,6 +26188,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"acid"
@@ -25836,6 +26282,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"cold"
@@ -25911,6 +26358,7 @@
 			"source": "DMG",
 			"page": 191,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"tier": "major",
 			"rarity": "rare",
@@ -25987,6 +26435,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"fire"
@@ -26005,6 +26454,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"force"
@@ -26076,6 +26526,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"lightning"
@@ -26113,6 +26564,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"necrotic"
@@ -26148,6 +26600,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"poison"
@@ -26166,6 +26619,7 @@
 			"source": "DMG",
 			"page": 191,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"tier": "major",
 			"rarity": "rare",
@@ -26185,6 +26639,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"psychic"
@@ -26203,6 +26658,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"radiant"
@@ -26380,7 +26836,7 @@
 			"recharge": "dawn",
 			"charges": 3,
 			"entries": [
-				"This ring has 3 charges, and it regains {@dice 1d3} expended charges daily at dawn. While wearing the ring, you can use an action to expend 1 to 3 of its charges to attack one creature you can see within 60 feet of you. The ring produces a spectral ram's head and makes its attack roll with a +7 bonus. On a hit, for each charge you spend, the target takes {@damage 2d10} force damage and is pushed 5 feet away from you.",
+				"This ring has 3 charges, and it regains {@dice 1d3} expended charges daily at dawn. While wearing the ring, you can use an action to expend 1 to 3 of its charges to make a ranged spell attack against one creature you can see within 60 feet of you. The ring produces a spectral ram's head and makes its attack roll with a +7 bonus. On a hit, for each charge you spend, the target takes {@damage 2d10} force damage and is pushed 5 feet away from you.",
 				"Alternatively, you can expend 1 to 3 of the ring's charges as an action to try to break an object you can see within 60 feet of you that isn't being worn or carried. The ring makes a Strength check with a +5 bonus for each charge you spend."
 			],
 			"lootTables": [
@@ -26412,6 +26868,7 @@
 			"source": "DMG",
 			"page": 192,
 			"srd": true,
+			"basicRules": true,
 			"type": "RG",
 			"resist": [
 				"thunder"
@@ -26856,6 +27313,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 4,
@@ -27171,6 +27629,8 @@
 			"name": "Rowboat",
 			"source": "DMG",
 			"page": 119,
+			"srd": true,
+			"basicRules": true,
 			"type": "SHP",
 			"rarity": "none",
 			"weight": 100,
@@ -27182,6 +27642,9 @@
 			"capPassenger": 3,
 			"entries": [
 				"Keelboats and rowboats are used on lakes and rivers, If going downstream, add the speed of the current (typically 3 miles per hour) to the speed of the vehicle. These vehicles can't be rowed against any significant current, but they can be pulled upstream by draft animals on the shores. A rowboat weighs 100 pounds, in case adventurers carry it over land."
+			],
+			"seeAlsoVehicle": [
+				"Rowboat"
 			]
 		},
 		{
@@ -27432,6 +27895,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 0.5,
@@ -27464,6 +27928,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"weight": 8,
@@ -27474,6 +27939,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -27483,6 +27949,8 @@
 			"name": "Sailing Ship",
 			"source": "DMG",
 			"page": 119,
+			"srd": true,
+			"basicRules": true,
 			"type": "SHP",
 			"rarity": "none",
 			"value": 1000000,
@@ -27492,7 +27960,10 @@
 			"vehDmgThresh": 15,
 			"vehSpeed": 2,
 			"capPassenger": 20,
-			"capCargo": 100
+			"capCargo": 100,
+			"seeAlsoVehicle": [
+				"Sailing Ship"
+			]
 		},
 		{
 			"name": "Saint Markovia's Thighbone",
@@ -27520,6 +27991,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -27585,6 +28057,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 10,
@@ -27840,6 +28313,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 50
@@ -28217,12 +28691,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Cloak.",
+									"name": "Cloak",
 									"entry": "The cloak is now a rare magic item that requires attunement. While wearing it, you have resistance to fire damage, and you have advantage on Dexterity ({@skill Stealth}) checks made while in snowy terrain."
 								},
 								{
 									"type": "item",
-									"name": "Boots.",
+									"name": "Boots",
 									"entry": "The pair of boots is now a rare magic item that requires attunement. While wearing it, you ignore difficult terrain while walking, and you can walk on water."
 								}
 							]
@@ -28328,6 +28802,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 1,
@@ -28348,6 +28823,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 200
@@ -28551,6 +29027,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -28561,6 +29038,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 5
@@ -28570,6 +29048,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 500
@@ -28579,6 +29058,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"value": 1000
@@ -28596,6 +29076,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -28713,6 +29194,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -28865,6 +29347,25 @@
 			"value": 75000
 		},
 		{
+			"name": "Silverquill Primer",
+			"source": "SCC",
+			"page": 39,
+			"rarity": "uncommon",
+			"reqAttune": "by a spellcaster",
+			"reqAttuneTags": [
+				{
+					"spellcasting": true
+				}
+			],
+			"wondrous": true,
+			"recharge": "dawn",
+			"charges": 3,
+			"entries": [
+				"The Silverquill Primer is a magic textbook created at Strixhaven's Silverquill College. The primer has 3 charges, and it regains {@dice 1d3} expended charges daily at dawn. If you make a Charisma ({@skill Intimidation}) or a Charisma ({@skill Persuasion}) check while holding the primer, you can expend 1 charge to give yourself a {@dice 1d4} bonus to the check, immediately after you roll the {@dice d20}.",
+				"In addition, if you study the primer at the end of a long rest, you can choose one 1st-level spell from the bard or cleric spell list. Before you finish your next long rest, you can cast the chosen spell once without a spell slot if you are holding the primer. Your spellcasting ability for this spell is your choice of Intelligence, Wisdom, or Charisma."
+			]
+		},
+		{
 			"name": "Simic Guild Signet",
 			"source": "GGR",
 			"page": 178,
@@ -28976,6 +29477,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "VEH",
 			"rarity": "none",
 			"weight": 300,
@@ -28998,6 +29500,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 10,
@@ -29162,6 +29665,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -29318,6 +29822,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 2
@@ -29389,12 +29894,12 @@
 							"items": [
 								{
 									"type": "item",
-									"name": "Drain Life.",
+									"name": "Drain Life",
 									"entry": "You siphon away some of the soul's essence and gain {@dice 1d10} temporary hit points."
 								},
 								{
 									"type": "item",
-									"name": "Query.",
+									"name": "Query",
 									"entry": "You telepathically ask the soul a question and receive a brief telepathic response, which you can understand. The soul knows only what it knew in life, but it must answer you truthfully and to the best of its ability. The answer is no more than a sentence or two and might be cryptic."
 								}
 							]
@@ -29714,6 +30219,7 @@
 			"source": "DMG",
 			"page": 200,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "common",
@@ -29734,6 +30240,7 @@
 			"source": "DMG",
 			"page": 201,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "uncommon",
@@ -29755,6 +30262,7 @@
 			"source": "DMG",
 			"page": 202,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "uncommon",
@@ -29775,6 +30283,7 @@
 			"source": "DMG",
 			"page": 203,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "rare",
@@ -29795,6 +30304,7 @@
 			"source": "DMG",
 			"page": 204,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "rare",
@@ -29815,6 +30325,7 @@
 			"source": "DMG",
 			"page": 205,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "very rare",
@@ -29835,6 +30346,7 @@
 			"source": "DMG",
 			"page": 206,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "very rare",
@@ -29855,6 +30367,7 @@
 			"source": "DMG",
 			"page": 207,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "very rare",
@@ -29876,6 +30389,7 @@
 			"source": "DMG",
 			"page": 208,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "legendary",
@@ -29896,6 +30410,7 @@
 			"source": "DMG",
 			"page": 199,
 			"srd": true,
+			"basicRules": true,
 			"type": "SC",
 			"tier": "minor",
 			"rarity": "common",
@@ -29915,6 +30430,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 3,
@@ -30202,6 +30718,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "SCF",
 			"scfType": "druid",
 			"rarity": "none",
@@ -30212,6 +30729,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -30235,6 +30753,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TAH",
 			"rarity": "none",
 			"value": 50
@@ -31335,6 +31854,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 0.5,
@@ -31385,21 +31905,21 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Chromatic.",
+							"name": "Chromatic",
 							"entries": [
 								"Whenever you use a spell slot to cast a spell that deals acid, cold, fire, lightning, or poison damage, roll a {@dice d6}, and you gain a bonus equal to the number rolled to one of the spell's damage rolls."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Gem.",
+							"name": "Gem",
 							"entries": [
 								"Whenever you use a spell slot to cast a spell, you can immediately teleport to an unoccupied space you can see within 15 feet of you."
 							]
 						},
 						{
 							"type": "item",
-							"name": "Metallic.",
+							"name": "Metallic",
 							"entries": [
 								"When a creature you can see within 30 feet of you makes a saving throw, you can use your reaction to give that creature advantage on the saving throw."
 							]
@@ -31749,6 +32269,16 @@
 			],
 			"attachedSpells": [
 				"control weather"
+			]
+		},
+		{
+			"name": "Strixhaven Pennant",
+			"source": "SCC",
+			"page": 39,
+			"rarity": "common",
+			"wondrous": true,
+			"entries": [
+				"This magic pennant bears the symbol of Strixhaven or one of its colleges: Lorehold, Prismari, Quandrix, Silverquill, or Witherbloom. While you wave the pennant, the symbol on it glitters, and the pennant sheds bright light in a 10-foot-radius and dim light for an additional 10 feet."
 			]
 		},
 		{
@@ -32672,6 +33202,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -33832,6 +34363,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -33904,6 +34436,7 @@
 			"name": "Three-Dragon Ante Set",
 			"source": "PHB",
 			"page": 154,
+			"basicRules": true,
 			"type": "GS",
 			"rarity": "none",
 			"value": 100
@@ -33979,6 +34512,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -34053,6 +34587,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -34278,6 +34813,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -34307,6 +34843,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "SCF",
 			"scfType": "druid",
 			"rarity": "none",
@@ -34341,6 +34878,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 4,
@@ -35483,6 +36021,7 @@
 			"name": "Trinket",
 			"source": "PHB",
 			"page": 159,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"entries": [
@@ -35962,6 +36501,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 20,
@@ -36146,6 +36686,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"value": 100,
@@ -36182,6 +36723,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"weight": 1,
@@ -36246,6 +36788,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "VEH",
 			"rarity": "none",
 			"weight": 400,
@@ -36324,21 +36867,21 @@
 					"items": [
 						{
 							"type": "item",
-							"name": "Chromatic.",
+							"name": "Chromatic",
 							"entries": [
 								"{@spell Hold monster}, {@spell Rime's binding ice|FTD}"
 							]
 						},
 						{
 							"type": "item",
-							"name": "Gem.",
+							"name": "Gem",
 							"entries": [
 								"{@spell Rary's telepathic bond}, {@spell Raulothim's psychic lance|FTD}"
 							]
 						},
 						{
 							"type": "item",
-							"name": "Metallic.",
+							"name": "Metallic",
 							"entries": [
 								"{@spell Fizban's platinum shield|FTD}, {@spell legend lore}"
 							]
@@ -36576,6 +37119,7 @@
 			"source": "DMG",
 			"page": 211,
 			"srd": true,
+			"basicRules": true,
 			"type": "WD",
 			"tier": "minor",
 			"rarity": "uncommon",
@@ -36598,6 +37142,7 @@
 			"source": "DMG",
 			"page": 211,
 			"srd": true,
+			"basicRules": true,
 			"type": "WD",
 			"tier": "major",
 			"rarity": "uncommon",
@@ -37086,6 +37631,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "MNT",
 			"rarity": "none",
 			"value": 40000,
@@ -37096,6 +37642,8 @@
 			"name": "Warship",
 			"source": "DMG",
 			"page": 119,
+			"srd": true,
+			"basicRules": true,
 			"type": "SHP",
 			"rarity": "none",
 			"value": 2500000,
@@ -37105,7 +37653,10 @@
 			"vehDmgThresh": 20,
 			"vehSpeed": 2.5,
 			"capPassenger": 60,
-			"capCargo": 200
+			"capCargo": 200,
+			"seeAlsoVehicle": [
+				"Warship"
+			]
 		},
 		{
 			"name": "Watchful Helm",
@@ -37128,6 +37679,7 @@
 			"source": "PHB",
 			"page": 153,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 5,
@@ -37227,6 +37779,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -37338,6 +37891,7 @@
 			"source": "PHB",
 			"page": 157,
 			"srd": true,
+			"basicRules": true,
 			"type": "TG",
 			"rarity": "none",
 			"weight": 1,
@@ -37475,6 +38029,7 @@
 			"source": "PHB",
 			"page": 150,
 			"srd": true,
+			"basicRules": true,
 			"type": "G",
 			"rarity": "none",
 			"weight": 1,
@@ -38106,10 +38661,30 @@
 			]
 		},
 		{
+			"name": "Witherbloom Primer",
+			"source": "SCC",
+			"page": 39,
+			"rarity": "uncommon",
+			"reqAttune": "by a spellcaster",
+			"reqAttuneTags": [
+				{
+					"spellcasting": true
+				}
+			],
+			"wondrous": true,
+			"recharge": "dawn",
+			"charges": 3,
+			"entries": [
+				"The Witherbloom Primer is a magic textbook created at Strixhaven's Witherbloom College. The primer has 3 charges, and it regains {@dice 1d3} expended charges daily at dawn. If you make an Intelligence ({@skill Nature}) or Wisdom ({@skill Survival}) check while holding the primer, you can expend 1 charge to give yourself a {@dice 1d4} bonus to the check, immediately after you roll the {@dice d20}.",
+				"In addition, if you study the primer at the end of a long rest, you can choose one 1st-level spell from the druid or wizard spell list. Before you finish your next long rest, you can cast the chosen spell once without a spell slot if you are holding the primer. Your spellcasting ability for this spell is your choice of Intelligence, Wisdom, or Charisma."
+			]
+		},
+		{
 			"name": "Woodcarver's Tools",
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"additionalSources": [
 				{
 					"source": "XGE",
@@ -38345,7 +38920,7 @@
 			"rarity": "none",
 			"value": 100,
 			"entries": [
-				"A yahcha (pronounced YAH-chah) is a harmless, meaty beetle about the size of a human hand, which feeds on worms and maggots. It moves slowly (walking speed 10 feet) and is easy to catch. A creature with mad monkey fever that eats a raw or cooked yahcha can immediately make a saving throw with advantage against that disease (see \"Diseases,\" page 40),"
+				"A yahcha (pronounced YAH-chah) is a harmless, meaty beetle about the size of a human hand, which feeds on worms and maggots. It moves slowly (walking speed 10 feet) and is easy to catch. A creature with blue mist fever that eats a raw or cooked yahcha can immediately make a saving throw with advantage against that disease (see \"Diseases,\" page 40),"
 			]
 		},
 		{
@@ -38374,6 +38949,7 @@
 			"source": "PHB",
 			"page": 151,
 			"srd": true,
+			"basicRules": true,
 			"type": "SCF",
 			"scfType": "druid",
 			"rarity": "none",
@@ -38688,6 +39264,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "AT",
 			"rarity": "none",
 			"items": [
@@ -39029,6 +39606,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "GS",
 			"rarity": "none",
 			"items": [
@@ -39285,6 +39863,7 @@
 			"source": "PHB",
 			"page": 154,
 			"srd": true,
+			"basicRules": true,
 			"type": "INS",
 			"rarity": "none",
 			"items": [

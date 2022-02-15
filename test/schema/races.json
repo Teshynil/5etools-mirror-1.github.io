@@ -1,13 +1,19 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "races.json",
-	"version": "1.9.0",
+	"version": "1.10.2",
 	"type": "object",
 	"definitions": {
 		"subraceData": {
 			"type": "object",
 			"properties": {
 				"name": {
+					"type": "string"
+				},
+				"raceName": {
+					"type": "string"
+				},
+				"raceSource": {
 					"type": "string"
 				},
 				"alias": {
@@ -24,6 +30,9 @@
 				},
 				"otherSources": {
 					"$ref": "util.json#/definitions/otherSources"
+				},
+				"reprintedAs": {
+					"$ref": "util.json#/definitions/reprintedAs"
 				},
 				"ability": {
 					"$ref": "#/definitions/abilityScores"
@@ -47,7 +56,7 @@
 					"type": "integer"
 				},
 				"feats": {
-					"type": "integer"
+					"$ref": "util.json#/definitions/additionalFeatsArray"
 				},
 				"traitTags": {
 					"oneOf": [
@@ -89,6 +98,9 @@
 				},
 				"srd": {
 					"$ref": "util.json#/definitions/srd"
+				},
+				"basicRules": {
+					"$ref": "util.json#/definitions/basicRules"
 				},
 				"heightAndWeight": {
 					"oneOf": [
@@ -247,6 +259,9 @@
 				"additionalSources": {
 					"$ref": "util.json#/definitions/additionalSources"
 				},
+				"reprintedAs": {
+					"$ref": "util.json#/definitions/reprintedAs"
+				},
 				"ability": {
 					"$ref": "#/definitions/abilityScores"
 				},
@@ -269,17 +284,11 @@
 				"soundClip": {
 					"$ref": "entry.json#/definitions/mediaHref"
 				},
-				"subraces": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/subraceData"
-					}
-				},
 				"darkvision": {
 					"type": "integer"
 				},
 				"feats": {
-					"type": "integer"
+					"$ref": "util.json#/definitions/additionalFeatsArray"
 				},
 				"traitTags": {
 					"oneOf": [
@@ -320,6 +329,9 @@
 				},
 				"srd": {
 					"$ref": "util.json#/definitions/srd"
+				},
+				"basicRules": {
+					"$ref": "util.json#/definitions/basicRules"
 				},
 				"heightAndWeight": {
 					"oneOf": [
@@ -372,6 +384,13 @@
 								"$ref": "util.json#/definitions/creatureType"
 							}
 						]
+					}
+				},
+				"creatureTypeTags": {
+					"type": "array",
+					"uniqueItems": true,
+					"items": {
+						"type": "string"
 					}
 				},
 				"age": {
@@ -462,10 +481,10 @@
 						"Magic Resistance",
 						"Monstrous Race",
 						"Natural Armor",
+						"Natural Weapon",
 						"NPC Race",
 						"Powerful Build",
 						"Sunlight Sensitivity",
-						"Unarmed Strike",
 						"Uncommon Race"
 					]
 				}
@@ -624,6 +643,9 @@
 						"additionalSources": {
 							"$ref": "util.json#/definitions/additionalSources"
 						},
+						"reprintedAs": {
+							"$ref": "util.json#/definitions/reprintedAs"
+						},
 						"ability": {
 							"$ref": "#/definitions/abilityScores"
 						},
@@ -646,17 +668,11 @@
 						"soundClip": {
 							"$ref": "entry.json#/definitions/mediaHref"
 						},
-						"subraces": {
-							"type": "array",
-							"items": {
-								"$ref": "#/definitions/subraceData"
-							}
-						},
 						"darkvision": {
 							"type": "integer"
 						},
 						"feats": {
-							"type": "integer"
+							"$ref": "util.json#/definitions/additionalFeatsArray"
 						},
 						"traitTags": {
 							"oneOf": [
@@ -697,6 +713,9 @@
 						},
 						"srd": {
 							"$ref": "util.json#/definitions/srd"
+						},
+						"basicRules": {
+							"$ref": "util.json#/definitions/basicRules"
 						},
 						"heightAndWeight": {
 							"oneOf": [
@@ -749,6 +768,13 @@
 										"$ref": "util.json#/definitions/creatureType"
 									}
 								]
+							}
+						},
+						"creatureTypeTags": {
+							"type": "array",
+							"uniqueItems": true,
+							"items": {
+								"type": "string"
 							}
 						},
 						"age": {
@@ -852,6 +878,9 @@
 						"additionalSources": {
 							"$ref": "util.json#/definitions/additionalSources"
 						},
+						"reprintedAs": {
+							"$ref": "util.json#/definitions/reprintedAs"
+						},
 						"ability": {
 							"$ref": "#/definitions/abilityScores"
 						},
@@ -874,17 +903,11 @@
 						"soundClip": {
 							"$ref": "entry.json#/definitions/mediaHref"
 						},
-						"subraces": {
-							"type": "array",
-							"items": {
-								"$ref": "#/definitions/subraceData"
-							}
-						},
 						"darkvision": {
 							"type": "integer"
 						},
 						"feats": {
-							"type": "integer"
+							"$ref": "util.json#/definitions/additionalFeatsArray"
 						},
 						"traitTags": {
 							"oneOf": [
@@ -925,6 +948,9 @@
 						},
 						"srd": {
 							"$ref": "util.json#/definitions/srd"
+						},
+						"basicRules": {
+							"$ref": "util.json#/definitions/basicRules"
 						},
 						"heightAndWeight": {
 							"oneOf": [
@@ -977,6 +1003,13 @@
 										"$ref": "util.json#/definitions/creatureType"
 									}
 								]
+							}
+						},
+						"creatureTypeTags": {
+							"type": "array",
+							"uniqueItems": true,
+							"items": {
+								"type": "string"
 							}
 						},
 						"age": {
@@ -1058,12 +1091,17 @@
 			]
 		},
 		"subrace": {
-			"description": "Homebrew use only.",
 			"anyOf": [
 				{
 					"type": "object",
 					"properties": {
 						"name": {
+							"type": "string"
+						},
+						"raceName": {
+							"type": "string"
+						},
+						"raceSource": {
 							"type": "string"
 						},
 						"alias": {
@@ -1080,6 +1118,9 @@
 						},
 						"otherSources": {
 							"$ref": "util.json#/definitions/otherSources"
+						},
+						"reprintedAs": {
+							"$ref": "util.json#/definitions/reprintedAs"
 						},
 						"ability": {
 							"$ref": "#/definitions/abilityScores"
@@ -1103,7 +1144,7 @@
 							"type": "integer"
 						},
 						"feats": {
-							"type": "integer"
+							"$ref": "util.json#/definitions/additionalFeatsArray"
 						},
 						"traitTags": {
 							"oneOf": [
@@ -1145,6 +1186,9 @@
 						},
 						"srd": {
 							"$ref": "util.json#/definitions/srd"
+						},
+						"basicRules": {
+							"$ref": "util.json#/definitions/basicRules"
 						},
 						"heightAndWeight": {
 							"oneOf": [
@@ -1279,15 +1323,21 @@
 					},
 					"additionalProperties": false,
 					"required": [
-						"name",
 						"source",
-						"race"
+						"raceName",
+						"raceSource"
 					]
 				},
 				{
 					"type": "object",
 					"properties": {
 						"name": {
+							"type": "string"
+						},
+						"raceName": {
+							"type": "string"
+						},
+						"raceSource": {
 							"type": "string"
 						},
 						"alias": {
@@ -1304,6 +1354,9 @@
 						},
 						"otherSources": {
 							"$ref": "util.json#/definitions/otherSources"
+						},
+						"reprintedAs": {
+							"$ref": "util.json#/definitions/reprintedAs"
 						},
 						"ability": {
 							"$ref": "#/definitions/abilityScores"
@@ -1327,7 +1380,7 @@
 							"type": "integer"
 						},
 						"feats": {
-							"type": "integer"
+							"$ref": "util.json#/definitions/additionalFeatsArray"
 						},
 						"traitTags": {
 							"oneOf": [
@@ -1369,6 +1422,9 @@
 						},
 						"srd": {
 							"$ref": "util.json#/definitions/srd"
+						},
+						"basicRules": {
+							"$ref": "util.json#/definitions/basicRules"
 						},
 						"heightAndWeight": {
 							"oneOf": [
@@ -1552,12 +1608,19 @@
 				"$ref": "#/definitions/race"
 			}
 		},
+		"subrace": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/subrace"
+			}
+		},
 		"_meta": {
 			"$ref": "util.json#/definitions/metaBlock"
 		}
 	},
 	"required": [
-		"race"
+		"race",
+		"subrace"
 	],
 	"additionalProperties": false
 }

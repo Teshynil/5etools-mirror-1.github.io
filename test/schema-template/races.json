@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "races.json",
-	"version": "1.9.0",
+	"version": "1.10.2",
 	"type": "object",
 
 	"definitions": {
@@ -11,6 +11,12 @@
 				"name": {
 					"type": "string"
 				},
+				"raceName": {
+					"type": "string"
+				},
+				"raceSource": {
+					"type": "string"
+				},
 				"alias": {
 					"type": "array",
 					"items": {
@@ -18,25 +24,11 @@
 					}
 				},
 				"$$ifBrew": {
-					"race": {
-						"description": "For use in homebrew files featuring standalone subraces of existing full races.",
-						"type": "object",
-						"properties": {
-							"name": {
-								"type": "string"
-							},
-							"source": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"name",
-							"source"
-						],
-						"additionalProperties": false
-					},
 					"fluff": {
 						"$ref": "#/definitions/fluff"
+					},
+					"foundryImg": {
+						"$ref": "util.json#/definitions/foundryImg"
 					}
 				},
 				"source": {
@@ -47,6 +39,9 @@
 				},
 				"otherSources": {
 					"$ref": "util.json#/definitions/otherSources"
+				},
+				"reprintedAs": {
+					"$ref": "util.json#/definitions/reprintedAs"
 				},
 				"ability": {
 					"$ref": "#/definitions/abilityScores"
@@ -70,7 +65,7 @@
 					"type": "integer"
 				},
 				"feats": {
-					"type": "integer"
+					"$ref": "util.json#/definitions/additionalFeatsArray"
 				},
 				"traitTags": {
 					"oneOf": [
@@ -112,6 +107,9 @@
 				},
 				"srd": {
 					"$ref": "util.json#/definitions/srd"
+				},
+				"basicRules": {
+					"$ref": "util.json#/definitions/basicRules"
 				},
 				"heightAndWeight": {
 					"oneOf": [
@@ -205,6 +203,9 @@
 				"additionalSources": {
 					"$ref": "util.json#/definitions/additionalSources"
 				},
+				"reprintedAs": {
+					"$ref": "util.json#/definitions/reprintedAs"
+				},
 				"ability": {
 					"$ref": "#/definitions/abilityScores"
 				},
@@ -227,17 +228,11 @@
 				"soundClip": {
 					"$ref": "entry.json#/definitions/mediaHref"
 				},
-				"subraces": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/subraceData"
-					}
-				},
 				"darkvision": {
 					"type": "integer"
 				},
 				"feats": {
-					"type": "integer"
+					"$ref": "util.json#/definitions/additionalFeatsArray"
 				},
 				"traitTags": {
 					"oneOf": [
@@ -278,6 +273,9 @@
 				},
 				"srd": {
 					"$ref": "util.json#/definitions/srd"
+				},
+				"basicRules": {
+					"$ref": "util.json#/definitions/basicRules"
 				},
 				"heightAndWeight": {
 					"oneOf": [
@@ -330,10 +328,22 @@
 						]
 					}
 				},
+				"creatureTypeTags": {
+					"type": "array",
+					"uniqueItems": true,
+					"items": {
+						"type": "string"
+					}
+				},
 				"age": {"$ref": "#/definitions/age"},
 				"hasFluff": {"type": "boolean"},
 				"hasFluffImages": {"type": "boolean"},
-				"_versions": {"$ref": "util.json#/definitions/versionsArray"}
+				"_versions": {"$ref": "util.json#/definitions/versionsArray"},
+				"$$ifBrew": {
+					"foundryImg": {
+						"$ref": "util.json#/definitions/foundryImg"
+					}
+				}
 			},
 			"additionalProperties": false
 		},
@@ -353,10 +363,10 @@
 						"Magic Resistance",
 						"Monstrous Race",
 						"Natural Armor",
+						"Natural Weapon",
 						"NPC Race",
 						"Powerful Build",
 						"Sunlight Sensitivity",
-						"Unarmed Strike",
 						"Uncommon Race"
 					]
 				}
@@ -496,7 +506,6 @@
 		},
 
 		"subrace": {
-			"description": "Homebrew use only.",
 			"anyOf": [
 				{
 					"type": "object",
@@ -505,11 +514,21 @@
 							"$ref": "#/definitions/subraceData"
 						},
 						{
-							"required": [
-								"name",
-								"source",
-								"race"
-							]
+							"$$ifSite": {
+								"required": [
+									"source",
+									"raceName",
+									"raceSource"
+								]
+							},
+							"$$ifBrew": {
+								"required": [
+									"name",
+									"source",
+									"raceName",
+									"raceSource"
+								]
+							}
 						}
 					]
 				},
@@ -572,18 +591,16 @@
 				"$ref": "#/definitions/race"
 			}
 		},
-		"$$ifBrew": {
-			"subrace": {
-				"type": "array",
-				"items": {
-					"$ref": "#/definitions/subrace"
-				}
+		"subrace": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/subrace"
 			}
 		},
 		"_meta": {
 			"$ref": "util.json#/definitions/metaBlock"
 		}
 	},
-	"required": ["race"],
+	"required": ["race", "subrace"],
 	"additionalProperties": false
 }

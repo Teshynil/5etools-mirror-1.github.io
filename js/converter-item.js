@@ -272,6 +272,7 @@ class ItemParser extends BaseParser {
 		const blacklistedProps = new Set([
 			"source",
 			"srd",
+			"basicRules",
 			"page",
 		]);
 
@@ -312,8 +313,11 @@ class ItemParser extends BaseParser {
 			case "axe": stats.requires = [{"axe": true}]; break;
 			case "armor": stats.requires = [{"armor": true}]; break;
 			case "bow": stats.requires = [{"bow": true}, {"crossbow": true}]; break;
+			case "bludgeoning": stats.requires = [{"dmgType": "B"}]; break;
+			case "piercing": stats.requires = [{"dmgType": "P"}]; break;
+			case "slashing": stats.requires = [{"dmgType": "S"}]; break;
 			default: {
-				stats.require = [{[genericType]: true}];
+				stats.requires = [{[genericType]: true}];
 				options.cbWarning(`${stats.name ? `(${stats.name}) ` : ""}Tagline part "${genericType}" requires manual conversion`);
 				break;
 			}
@@ -359,6 +363,7 @@ ItemParser._ALL_CLASSES = null;
 ItemParser._MAPPED_ITEM_NAMES = {
 	"studded leather": "studded leather armor",
 	"leather": "leather armor",
+	"scale": "scale mail",
 };
 
 if (typeof module !== "undefined") {

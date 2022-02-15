@@ -4,7 +4,7 @@
 
 	"title": "Util",
 	"description": "Utility definitions to be used in other schemas.",
-	"version": "1.11.0",
+	"version": "1.11.7",
 
 	"definitions" : {
 		"metaBlock": {
@@ -66,6 +66,33 @@
 					"source"
 				],
 				"additionalProperties": false
+			}
+		},
+
+		"reprintedAs": {
+			"type": "array",
+			"items": {
+				"oneOf": [
+					{
+						"description": "A UID, e.g. \"longsword|phb\"",
+						"type": "string"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"uid": {
+								"description": "A UID, e.g. \"longsword|phb\"",
+								"type": "string"
+							},
+							"tag": {
+								"description": "A tag used in the renderer, e.g. \"creature\"",
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"required": ["tag", "uid"]
+					}
+				]
 			}
 		},
 
@@ -140,38 +167,42 @@
 
 		"toolNameLower": {
 			"type": "string",
-			"enum": [
-				"artisan's tools",
+			"$$ifSiteElse_key": {
+				"keySite": "enum",
+				"keyBrew": "examples",
+				"value": [
+					"artisan's tools",
 
-				"alchemist's supplies",
-				"brewer's supplies",
-				"calligrapher's supplies",
-				"carpenter's tools",
-				"cartographer's tools",
-				"cobbler's tools",
-				"cook's utensils",
-				"glassblower's tools",
-				"jeweler's tools",
-				"leatherworker's tools",
-				"mason's tools",
-				"painter's supplies",
-				"potter's tools",
-				"smith's tools",
-				"tinker's tools",
-				"weaver's tools",
-				"woodcarver's tools",
+					"alchemist's supplies",
+					"brewer's supplies",
+					"calligrapher's supplies",
+					"carpenter's tools",
+					"cartographer's tools",
+					"cobbler's tools",
+					"cook's utensils",
+					"glassblower's tools",
+					"jeweler's tools",
+					"leatherworker's tools",
+					"mason's tools",
+					"painter's supplies",
+					"potter's tools",
+					"smith's tools",
+					"tinker's tools",
+					"weaver's tools",
+					"woodcarver's tools",
 
-				"disguise kit",
-				"forgery kit",
-				"gaming set",
-				"herbalism kit",
-				"musical instrument",
-				"navigator's tools",
-				"thieves' tools",
-				"poisoner's kit",
-				"vehicles (land)",
-				"vehicles (water)"
-			]
+					"disguise kit",
+					"forgery kit",
+					"gaming set",
+					"herbalism kit",
+					"musical instrument",
+					"navigator's tools",
+					"thieves' tools",
+					"poisoner's kit",
+					"vehicles (land)",
+					"vehicles (water)"
+				]
+			}
 		},
 
 		"toolProficiencies": {
@@ -228,32 +259,39 @@
 						},
 						"additionalProperties": false
 					}
+				},
+				"$$ifBrew": {
+					"additionalProperties": {"type": "boolean"}
 				}
 			}
 		},
 
 		"skillNameLower": {
 			"type": "string",
-			"enum": [
-				"athletics",
-				"acrobatics",
-				"sleight of hand",
-				"stealth",
-				"arcana",
-				"history",
-				"investigation",
-				"nature",
-				"religion",
-				"animal handling",
-				"insight",
-				"medicine",
-				"perception",
-				"survival",
-				"deception",
-				"intimidation",
-				"performance",
-				"persuasion"
-			]
+			"$$ifSiteElse_key": {
+				"keySite": "enum",
+				"keyBrew": "examples",
+				"value": [
+					"athletics",
+					"acrobatics",
+					"sleight of hand",
+					"stealth",
+					"arcana",
+					"history",
+					"investigation",
+					"nature",
+					"religion",
+					"animal handling",
+					"insight",
+					"medicine",
+					"perception",
+					"survival",
+					"deception",
+					"intimidation",
+					"performance",
+					"persuasion"
+				]
+			}
 		},
 
 		"skillProficiencies": {
@@ -298,7 +336,12 @@
 						"additionalProperties": false
 					}
 				},
-				"additionalProperties": false
+				"$$ifSite": {
+					"additionalProperties": false
+				},
+				"$$ifBrew": {
+					"additionalProperties": {"type": "boolean"}
+				}
 			}
 		},
 
@@ -421,7 +464,12 @@
 						}
 					}
 				},
-				"additionalProperties": false
+				"$$ifSite": {
+					"additionalProperties": false
+				},
+				"$$ifBrew": {
+					"additionalProperties": {"type": "boolean"}
+				}
 			}
 		},
 
@@ -608,6 +656,17 @@
 			}
 		},
 
+		"additionalFeatsArray": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"any": {"type": "integer"}
+				},
+				"additionalProperties": {"type": "boolean"}
+			}
+		},
+
 		"proficiencyTag": {
 			"type": "string",
 			"enum": [
@@ -617,11 +676,6 @@
 				"Tool Proficiency",
 				"Language Proficiency"
 			]
-		},
-
-		"proficiencyTags": {
-			"type": "array",
-			"items": {"$ref": "#/definitions/proficiencyTag"}
 		},
 
 		"_speedVal": {
@@ -641,6 +695,9 @@
 				},
 				{
 					"type": "integer"
+				},
+				{
+					"const": true
 				}
 			]
 		},
@@ -834,6 +891,12 @@
 							"$ref": "entry.json"
 						}
 					},
+					"feat": {
+						"type": "array",
+						"items": {
+							"$ref": "entry.json"
+						}
+					},
 					"feature": {
 						"type": "array",
 						"items": {
@@ -1002,25 +1065,29 @@
 
 		"dataCondition": {
 			"type": "string",
-			"enum": [
-				"blinded",
-				"charmed",
-				"deafened",
-				"exhaustion",
-				"frightened",
-				"grappled",
-				"incapacitated",
-				"invisible",
-				"paralyzed",
-				"petrified",
-				"poisoned",
-				"prone",
-				"restrained",
-				"stunned",
-				"unconscious",
+			"$$ifSiteElse_key": {
+				"keySite": "enum",
+				"keyBrew": "examples",
+				"value": [
+					"blinded",
+					"charmed",
+					"deafened",
+					"exhaustion",
+					"frightened",
+					"grappled",
+					"incapacitated",
+					"invisible",
+					"paralyzed",
+					"petrified",
+					"poisoned",
+					"prone",
+					"restrained",
+					"stunned",
+					"unconscious",
 
-				"disease"
-			]
+					"disease"
+				]
+			}
 		},
 
 		"dataDamageType": {
@@ -1045,9 +1112,13 @@
 		"dataOptionalfeatureType": {
 			"type": "string",
 			"description": "AF: Alchemical Formula\n AI: Artificer Infusion\n AS: Arcane Shot\n AS:V1-UA: Arcane Shot, V1 (UA)\n AS:V2-UA: Arcane Shot, V2 (UA)\n ED: Elemental Discipline\n EI: Eldritch Invocation\n FS:B: Fighting Style; Bard\n FS:F: Fighting Style; Fighter\n FS:P: Fighting Style; Paladin\n FS:R: Fighting Style; Ranger\n IWM:A: Infernal War Machine Upgrade, Armor\n IWM:G: Infernal War Machine Upgrade, Gadget\n IWM:W: Infernal War Machine Variant, Weapon\n MM: Metamagic\n MV: Maneuver\n MV:B: Maneuver, Battle Master\n MV:C2-UA: Maneuver, Cavalier V2 (UA)\n OR: Onomancy Resonant\n OTH: Other\n PB: Pact Boon\n RN: Rune Knight Rune\n SHP:F: Ship Upgrade, Figurehead\n SHP:H: Ship Upgrade, Hull\n SHP:M: Ship Upgrade, Movement\n SHP:O: Ship Upgrade, Miscellaneous\n SHP:W: Ship Upgrade, Weapon",
-			"enum": [
-				"ED", "EI", "MM", "MV", "MV:B", "OTH", "FS:F", "FS:B", "FS:R", "FS:P", "MV:C2-UA", "AS:V1-UA", "AS:V2-UA", "AS", "PB", "AI", "SHP:H", "SHP:M", "SHP:W", "SHP:F", "SHP:O", "IWM:W", "IWM:A", "IWM:G", "OR", "RN", "AF"
-			]
+			"$$ifSiteElse_key": {
+				"keySite": "enum",
+				"keyBrew": "examples",
+				"value": [
+					"ED", "EI", "MM", "MV", "MV:B", "OTH", "FS:F", "FS:B", "FS:R", "FS:P", "MV:C2-UA", "AS:V1-UA", "AS:V2-UA", "AS", "PB", "AI", "SHP:H", "SHP:M", "SHP:W", "SHP:F", "SHP:O", "IWM:W", "IWM:A", "IWM:G", "OR", "RN", "AF"
+				]
+			}
 		},
 
 		"damageImmunityArray": {
@@ -1335,6 +1406,48 @@
 			}
 		},
 
+		"resourcesArray": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {"type": "string"},
+					"type": {"type": "string"},
+
+					"recharge": {"type": "string"},
+					"count": {"type": ["integer", "string"]},
+					"number": {"type": ["integer", "string"]},
+					"faces": {"type": ["integer", "string"]}
+				},
+				"required": ["name", "type"]
+			}
+		},
+
+		"consumesObject": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"$$ifSiteElse_key": {
+						"keySite": "enum",
+						"keyBrew": "examples",
+						"value": [
+							"Superiority Dice",
+							"Ki",
+							"Channel Divinity",
+							"Psionic Energy Dice",
+							"Wild Shape",
+							"Sorcery Points",
+							"Arcane Shot"
+						]
+					}
+				},
+				"amount": {"type": "integer"}
+			},
+			"required": ["name"],
+			"additionalProperties": false
+		},
+
 		"dataDamageTags": {
 			"type": "string",
 			"description": "A: Acid\n B: Bludgeoning\n C: Cold\n F: Fire\n O: Force\n L: Lightning\n N: Necrotic\n P: Piercing\n I: Poison\n Y: Psychic\n R: Radiant\n S: Slashing\n T: Thunder",
@@ -1423,23 +1536,27 @@
 			"uniqueItems": true,
 			"items": {
 				"type": "string",
-				"enum": [
-					"blinded",
-					"charmed",
-					"deafened",
-					"exhaustion",
-					"frightened",
-					"grappled",
-					"incapacitated",
-					"invisible",
-					"paralyzed",
-					"petrified",
-					"poisoned",
-					"prone",
-					"restrained",
-					"stunned",
-					"unconscious"
-				]
+				"$$ifSiteElse_key": {
+					"keySite": "enum",
+					"keyBrew": "examples",
+					"value": [
+						"blinded",
+						"charmed",
+						"deafened",
+						"exhaustion",
+						"frightened",
+						"grappled",
+						"incapacitated",
+						"invisible",
+						"paralyzed",
+						"petrified",
+						"poisoned",
+						"prone",
+						"restrained",
+						"stunned",
+						"unconscious"
+					]
+				}
 			}
 		},
 
@@ -1799,6 +1916,10 @@
 			"type": ["boolean", "string"]
 		},
 
+		"basicRules": {
+			"type": "boolean"
+		},
+
 		"fluffObject": {
 			"type": "object",
 			"properties": {
@@ -2134,6 +2255,10 @@
 
 		"foundryDataObject": {
 			"type": "object"
+		},
+
+		"foundryImg": {
+			"type": "string"
 		},
 
 		"foundrySubEntitiesObject": {

@@ -1,13 +1,14 @@
 const fs = require("fs");
 require("../js/utils");
 const ut = require("./util.js");
+const path = require("path");
 
 const DIR_IN = "./test/schema-template/";
 const DIR_OUT = "./test/schema/";
 
 class SchemaPreprocessor {
-	static preprocess ({schema, isBrew = false, dirSource}) {
-		this._recurse({root: schema, obj: schema, isBrew, dirSource});
+	static preprocess ({schema, isBrew = false, isFast = false, dirSource}) {
+		this._recurse({root: schema, obj: schema, isBrew, isFast, dirSource});
 		return schema;
 	}
 
@@ -42,38 +43,39 @@ class SchemaPreprocessor {
 		bKeys.forEach(bk => a[bk] = b[bk]);
 	}
 
-	static _recurse ({root, obj, isBrew, dirSource}) {
+	static _recurse ({root, obj, isBrew, isFast, dirSource}) {
 		if (typeof obj !== "object") return obj;
 
 		if (obj instanceof Array) {
 			return obj
 				.filter(d => d.$$ifBrew_item ? isBrew : d.$$ifSite_item ? !isBrew : true)
 				.map(d => {
-					if (d.$$ifBrew_item) return this._recurse({root, obj: d.$$ifBrew_item, isBrew, dirSource});
-					if (d.$$ifSite_item) return this._recurse({root, obj: d.$$ifSite_item, isBrew, dirSource});
-					return this._recurse({root, obj: d, isBrew, dirSource});
+					if (d.$$ifBrew_item) return this._recurse({root, obj: d.$$ifBrew_item, isBrew, isFast, dirSource});
+					if (d.$$ifSite_item) return this._recurse({root, obj: d.$$ifSite_item, isBrew, isFast, dirSource});
+					return this._recurse({root, obj: d, isBrew, isFast, dirSource});
 				});
 		}
 
 		Object.entries(obj)
 			.forEach(([k, v]) => {
 				switch (k) {
-					case "$$merge": return this._recurse_$$merge({root, obj, k, v, isBrew, dirSource});
-					case "$$ifBrew": return this._recurse_$$ifBrew({root, obj, k, v, isBrew, dirSource});
-					case "$$ifSite": return this._recurse_$$ifSite({root, obj, k, v, isBrew, dirSource});
-					case "$$ifSiteElse_key": return this._recurse_$$ifSiteElse_key({root, obj, k, v, isBrew, dirSource});
-					default: return obj[k] = this._recurse({root, obj: v, isBrew, dirSource});
+					case "$$merge": return this._recurse_$$merge({root, obj, k, v, isBrew, isFast, dirSource});
+					case "$$ifBrew": return this._recurse_$$ifBrew({root, obj, k, v, isBrew, isFast, dirSource});
+					case "$$ifSite": return this._recurse_$$ifSite({root, obj, k, v, isBrew, isFast, dirSource});
+					case "$$ifNotFast": return this._recurse_$$ifNotFast({root, obj, k, v, isBrew, isFast, dirSource});
+					case "$$ifSiteElse_key": return this._recurse_$$ifSiteElse_key({root, obj, k, v, isBrew, isFast, dirSource});
+					default: return obj[k] = this._recurse({root, obj: v, isBrew, isFast, dirSource});
 				}
 			});
 
 		return obj;
 	}
 
-	static _recurse_$$merge ({root, obj, k, v, isBrew, dirSource}) {
+	static _recurse_$$merge ({root, obj, k, v, isBrew, isFast, dirSource}) {
 		const merged = {};
 		v.forEach(toMerge => {
 			// handle any mergeable children
-			toMerge = this._recurse({root, obj: toMerge});
+			toMerge = this._recurse({root, obj: toMerge, isBrew, isFast});
 			// resolve references
 			toMerge = this._getResolvedRefJson({root, toMerge, dirSource});
 			// merge
@@ -88,13 +90,18 @@ class SchemaPreprocessor {
 		this._mutMergeObjects(obj, merged);
 	}
 
-	static _recurse_$$ifBrew ({root, obj, k, v, isBrew, dirSource}) {
+	static _recurse_$$ifBrew ({root, obj, k, v, isBrew, isFast, dirSource}) {
 		if (!isBrew) return void delete obj[k];
 		this._recurse_$$if({root, obj, k, v});
 	}
 
-	static _recurse_$$ifSite ({root, obj, k, v, isBrew, dirSource}) {
+	static _recurse_$$ifSite ({root, obj, k, v, isBrew, isFast, dirSource}) {
 		if (isBrew) return void delete obj[k];
+		this._recurse_$$if({root, obj, k, v});
+	}
+
+	static _recurse_$$ifNotFast ({root, obj, k, v, isBrew, isFast, dirSource}) {
+		if (isFast) return void delete obj[k];
 		this._recurse_$$if({root, obj, k, v});
 	}
 
@@ -114,7 +121,7 @@ class SchemaPreprocessor {
 		delete obj[k];
 	}
 
-	static _recurse_$$ifSiteElse_key ({root, obj, k, v, isBrew, dirSource}) {
+	static _recurse_$$ifSiteElse_key ({root, obj, k, v, isBrew, isFast, dirSource}) {
 		const key = v[isBrew ? "keyBrew" : "keySite"];
 		obj[k] = {[key]: v.value};
 		return this._recurse_$$if({root, obj, k, v: obj[k]});
@@ -123,16 +130,16 @@ class SchemaPreprocessor {
 	static _getResolvedRefJson ({root, toMerge, dirSource}) {
 		if (!toMerge.$ref) return toMerge;
 
-		const [file, path] = toMerge.$ref.split("#");
-		const pathParts = path.split("/").filter(Boolean);
+		const [file, defPath] = toMerge.$ref.split("#");
+		const pathParts = defPath.split("/").filter(Boolean);
 
 		if (!file) {
 			const refData = MiscUtil.get(root, ...pathParts);
-			if (!refData) throw new Error(`Could not find referenced data for "${path}" in local file!`);
+			if (!refData) throw new Error(`Could not find referenced data for "${defPath}" in local file!`);
 			return refData;
 		}
 
-		const externalSchema = ut.readJson(`${dirSource}/${file}`);
+		const externalSchema = ut.readJson(path.join(dirSource, file));
 		const refData = MiscUtil.get(externalSchema, ...pathParts);
 
 		// Convert any `#/ ...` definitions to refer to the original file, as the schema will be copied into our file
@@ -148,7 +155,7 @@ class SchemaPreprocessor {
 			},
 		);
 
-		if (!refData) throw new Error(`Could not find referenced data for path "${path}" in file "${file}"!`);
+		if (!refData) throw new Error(`Could not find referenced data for path "${defPath}" in file "${file}"!`);
 		return refData;
 	}
 }
@@ -160,22 +167,26 @@ class SchemaCompiler {
 
 		console.log("Compiling schema...");
 
+		const dirOut = path.normalize(ut.ArgParser.ARGS.output ?? DIR_OUT);
+
 		const filesTemplate = ut.listFiles({dir: "./test/schema-template", whitelistFileExts: [".json"]});
 
 		filesTemplate.forEach(filePath => {
-			const filePathOut = filePath.replace(DIR_IN, DIR_OUT);
-			const filePathOutParts = filePathOut.split("/");
-			const dirPathOut = filePathOutParts.slice(0, -1).join("/");
+			filePath = path.normalize(filePath);
+			const filePathPartRelative = path.relative(DIR_IN, filePath);
+			const filePathOut = path.join(dirOut, filePathPartRelative);
+			const dirPathOut = path.dirname(filePathOut);
 			const compiled = SchemaPreprocessor.preprocess({
 				schema: ut.readJson(filePath, "utf8"),
 				isBrew: ut.ArgParser.ARGS.homebrew,
-				dirSource: filePath.split("/").slice(0, -1).join("/"),
+				isFast: ut.ArgParser.ARGS.fast,
+				dirSource: path.dirname(filePath),
 			});
 			fs.mkdirSync(dirPathOut, {recursive: true});
 			fs.writeFileSync(filePathOut, JSON.stringify(compiled, null, "\t"), "utf-8");
 		});
 
-		console.log("Schema compiled.");
+		console.log(`Schema compiled and output to ${dirOut}`);
 	}
 }
 

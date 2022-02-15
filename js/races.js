@@ -49,19 +49,21 @@ class RacesPage extends ListPage {
 	}
 
 	getListItem (race, rcI, isExcluded) {
+		const hash = UrlUtil.autoEncodeHash(race);
+		if (this._seenHashes.has(hash)) return null;
+		this._seenHashes.add(hash);
+
 		this._pageFilter.mutateAndAddToFilters(race, isExcluded);
 
 		const eleLi = document.createElement("div");
-		eleLi.className = `lst__row flex-col ${isExcluded ? "lst__row--blacklisted" : ""}`;
+		eleLi.className = `lst__row ve-flex-col ${isExcluded ? "lst__row--blacklisted" : ""}`;
 
-		const hash = UrlUtil.autoEncodeHash(race);
-		const ability = race.ability ? Renderer.getAbilityData(race.ability) : {asTextShort: "None"};
 		const size = (race.size || [SZ_VARIES]).map(sz => Parser.sizeAbvToFull(sz)).join("/");
 		const source = Parser.sourceJsonToAbv(race.source);
 
 		eleLi.innerHTML = `<a href="#${hash}" class="lst--border lst__row-inner">
 			<span class="bold col-4 pl-0">${race.name}</span>
-			<span class="col-4">${ability.asTextShort}</span>
+			<span class="col-4 ${race._slAbility === "Lineage (choose)" ? "italic" : ""}">${race._slAbility}</span>
 			<span class="col-2 text-center">${size}</span>
 			<span class="col-2 text-center ${Parser.sourceJsonToColor(race.source)} pr-0" title="${Parser.sourceJsonToFull(race.source)}" ${BrewUtil.sourceJsonToStyle(race.source)}>${source}</span>
 		</a>`;
@@ -72,7 +74,7 @@ class RacesPage extends ListPage {
 			race.name,
 			{
 				hash,
-				ability: ability.asTextShort,
+				ability: race._slAbility,
 				size,
 				source,
 				cleanName: PageFilterRaces.getInvertedName(race.name) || "",
@@ -99,10 +101,10 @@ class RacesPage extends ListPage {
 	pGetSublistItem (race, ix) {
 		const hash = UrlUtil.autoEncodeHash(race);
 
-		const $ele = $(`<div class="lst__row lst__row--sublist flex-col">
+		const $ele = $(`<div class="lst__row lst__row--sublist ve-flex-col">
 				<a href="#${UrlUtil.autoEncodeHash(race)}" class="lst--border lst__row-inner">
 					<span class="bold col-5 pl-0">${race.name}</span>
-					<span class="col-5">${race._slAbility}</span>
+					<span class="col-5 ${race._slAbility === "Lineage (choose)" ? "italic" : ""}">${race._slAbility}</span>
 					<span class="col-2 text-center pr-0">${(race.size || [SZ_VARIES]).map(sz => Parser.sizeAbvToFull(sz)).join("/")}</span>
 				</a>
 			</div>

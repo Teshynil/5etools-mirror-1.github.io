@@ -59,10 +59,12 @@ class PageFilterOptionalFeatures extends PageFilter {
 				this._featureFilter,
 			],
 		});
-		this._miscFilter = new Filter({header: "Miscellaneous", items: ["SRD", "Grants Additional Spells"], isSrdFilter: true});
+		this._miscFilter = new Filter({header: "Miscellaneous", items: ["SRD", "Grants Additional Spells"], isMiscFilter: true});
 	}
 
 	static mutateForFilters (it) {
+		it._fSources = SourceFilter.getCompleteFilterSources(it);
+
 		// (Convert legacy string format to array)
 		it.featureType = it.featureType && it.featureType instanceof Array ? it.featureType : it.featureType ? [it.featureType] : ["OTH"];
 		if (it.prerequisite) {
@@ -107,7 +109,7 @@ class PageFilterOptionalFeatures extends PageFilter {
 	addToFilters (it, isExcluded) {
 		if (isExcluded) return;
 
-		this._sourceFilter.addItem(it.source);
+		this._sourceFilter.addItem(it._fSources);
 		this._typeFilter.addItem(it.featureType);
 		this._pactFilter.addItem(it._fPrereqPact);
 		this._patronFilter.addItem(it._fPrereqPatron);
@@ -132,7 +134,7 @@ class PageFilterOptionalFeatures extends PageFilter {
 	toDisplay (values, it) {
 		return this._filterBox.toDisplay(
 			values,
-			it.source,
+			it._fSources,
 			it.featureType,
 			[
 				it._fPrereqPact,

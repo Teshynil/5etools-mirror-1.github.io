@@ -287,14 +287,14 @@
 				"MW",
 				"RCH"
 			],
-			"hasToken": true,
-			"hasFluff": true,
-			"hasFluffImages": true,
 			"conditionInflict": [
 				"frightened",
 				"grappled",
 				"stunned"
-			]
+			],
+			"hasToken": true,
+			"hasFluff": true,
+			"hasFluffImages": true
 		},
 		{
 			"name": "Aeorian Reverser",
@@ -3182,7 +3182,9 @@
 		},
 		{
 			"name": "Sea Fury",
-			"group": "Hags",
+			"group": [
+				"Hags"
+			],
 			"source": "EGW",
 			"page": 299,
 			"size": "M",
@@ -3556,7 +3558,7 @@
 				{
 					"name": "Special Equipment",
 					"entries": [
-						"Sken wears a ring of obscuring. With it, she can cast the fog cloud spell centered on herself three times per day. The cloud lasts for 1 minute (no concentration required)."
+						"Sken wears a ring of obscuring. With it, she can cast the {@spell fog cloud} spell centered on herself three times per day. The cloud lasts for 1 minute (no concentration required)."
 					]
 				}
 			],

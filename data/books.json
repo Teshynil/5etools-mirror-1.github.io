@@ -462,7 +462,7 @@
 			"name": "Sword Coast Adventurer's Guide",
 			"id": "SCAG",
 			"source": "SCAG",
-			"group": "supplement",
+			"group": "setting",
 			"coverUrl": "img/covers/SCAG.png",
 			"published": "2015-11-03",
 			"author": "Wizards RPG Team",
@@ -847,7 +847,7 @@
 			"name": "Guildmasters' Guide to Ravnica",
 			"id": "GGR",
 			"source": "GGR",
-			"group": "supplement",
+			"group": "setting",
 			"coverUrl": "img/covers/GGR.png",
 			"published": "2018-11-20",
 			"contents": [
@@ -1255,7 +1255,7 @@
 			"name": "Eberron: Rising from the Last War",
 			"id": "ERLW",
 			"source": "ERLW",
-			"group": "supplement",
+			"group": "setting",
 			"coverUrl": "img/covers/ERLW.png",
 			"published": "2019-11-19",
 			"contents": [
@@ -1513,7 +1513,7 @@
 			"name": "Explorer's Guide to Wildemount",
 			"id": "EGW",
 			"source": "EGW",
-			"group": "supplement",
+			"group": "setting",
 			"coverUrl": "img/covers/EGW.png",
 			"published": "2020-03-17",
 			"contents": [
@@ -1812,7 +1812,7 @@
 			"name": "Mythic Odysseys of Theros",
 			"id": "MOT",
 			"source": "MOT",
-			"group": "supplement",
+			"group": "setting",
 			"coverUrl": "img/covers/MOT.png",
 			"published": "2020-06-02",
 			"contents": [
@@ -1927,6 +1927,38 @@
 						"type": "chapter",
 						"identifier": 6
 					}
+				}
+			]
+		},
+		{
+			"name": "Dungeon Master's Screen: Dungeon Kit",
+			"id": "ScreenDungeonKit",
+			"source": "ScreenDungeonKit",
+			"group": "screen",
+			"coverUrl": "img/covers/ScreenDungeonKit.webp",
+			"published": "2020-09-21",
+			"contents": [
+				{
+					"name": "Screen",
+					"headers": [
+						"Long Jump",
+						"High Jump",
+						"Suffocating",
+						"Concentration",
+						"Exhaustion",
+						"Conditions",
+						"State of Ruin",
+						"Dungeon Encounters",
+						"Dungeon Chambers"
+					]
+				},
+				{
+					"name": "Included Accessories",
+					"headers": [
+						"Condition and Hazard Cards",
+						"Initiative Cards",
+						"Geomorph Cards"
+					]
 				}
 			]
 		},
@@ -2103,7 +2135,7 @@
 			"name": "Van Richten's Guide to Ravenloft",
 			"id": "VRGR",
 			"source": "VRGR",
-			"group": "supplement",
+			"group": "setting",
 			"coverUrl": "img/covers/VRGR.png",
 			"published": "2021-05-18",
 			"contents": [
@@ -3074,6 +3106,139 @@
 						"Challenge Ratings",
 						"Creature Types"
 					]
+				}
+			]
+		},
+		{
+			"name": "Strixhaven: A Curriculum of Chaos",
+			"id": "SCC",
+			"source": "SCC",
+			"group": "setting",
+			"coverUrl": "img/covers/SCC.png",
+			"published": "2021-12-07",
+			"author": "Wizards RPG Team",
+			"contents": [
+				{
+					"name": "Welcome to Strixhaven",
+					"headers": [
+						"About This Book",
+						"Orientation",
+						"Strixhaven's World"
+					]
+				},
+				{
+					"name": "Life at Strixhaven",
+					"headers": [
+						"Magical Study",
+						"Campus Overview",
+						"Lorehold College",
+						"Prismari College",
+						"Quandrix College",
+						"Silverquill College",
+						"Witherbloom College"
+					],
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 1
+					}
+				},
+				{
+					"name": "Character Options",
+					"headers": [
+						"Race Option",
+						"Choosing a College",
+						"Strixhaven Backgrounds",
+						"Feats",
+						"Spells",
+						"Magic Items"
+					],
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 2
+					}
+				},
+				{
+					"name": "School Is in Session",
+					"headers": [
+						"Running the Adventures",
+						"Strixhaven Tracking Sheet",
+						"Extracurriculars",
+						"Jobs",
+						"Exams",
+						"Relationships",
+						"Session Zero",
+						"Using These Rules",
+						"Making Friends and Rivals",
+						"Fellow Students"
+					],
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 3
+					}
+				},
+				{
+					"name": "Campus Kerfuffle",
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 3
+					}
+				},
+				{
+					"name": "Hunt for Mage Tower",
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 4
+					}
+				},
+				{
+					"name": "The Magister's Masquerade",
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 5
+					}
+				},
+				{
+					"name": "A Reckoning in Ruins",
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 6
+					}
+				},
+				{
+					"name": "Friends and Foes",
+					"headers": [
+						"Using a Stat Block"
+					],
+					"ordinal": {
+						"type": "chapter",
+						"identifier": 7
+					}
+				},
+				{
+					"name": "Campus Map",
+					"ordinal": {
+						"type": "appendix"
+					}
+				}
+			]
+		},
+		{
+			"name": "Mordenkainen Presents: Monsters of the Multiverse",
+			"id": "MPMM",
+			"source": "MPMM",
+			"group": "supplement",
+			"coverUrl": "img/covers/MPMM.png",
+			"published": "2022-01-25",
+			"author": "Wizards RPG Team",
+			"contents": [
+				{
+					"name": "Using This Book"
+				},
+				{
+					"name": "Fantastical Races"
+				},
+				{
+					"name": "Bestiary"
 				}
 			]
 		}

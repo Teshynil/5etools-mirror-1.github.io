@@ -4,7 +4,7 @@
 
 	"title": "Entry",
 	"description": "A recursively renderable object.",
-	"version": "1.5.1",
+	"version": "1.5.4",
 
 	"definitions" : {
 		"_arrayOfSpell": {
@@ -75,9 +75,11 @@
 					"type": "string"
 				}
 			},
-			"required": [
-				"type"
-			]
+			"$$ifSite": {
+				"required": [
+					"type"
+				]
+			}
 		},
 
 		"entrySection": {
@@ -914,6 +916,9 @@
 								},
 								"entry": {
 									"$ref": "#"
+								},
+								"nameDot": {
+									"const": false
 								}
 							},
 							"required": ["name", "entry"],
@@ -932,6 +937,9 @@
 									"items": {
 										"$ref": "#"
 									}
+								},
+								"nameDot": {
+									"const": false
 								}
 							},
 							"required": ["name", "entries"],
@@ -953,6 +961,9 @@
 						},
 						"entry": {
 							"$ref": "#"
+						},
+						"nameDot": {
+							"const": false
 						}
 					},
 					"required": ["name", "entry"],
@@ -1003,8 +1014,29 @@
 						"imageType": {
 							"type": "string",
 							"enum": [
-								"map"
+								"map",
+								"mapPlayer"
 							]
+						},
+						"grid": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string",
+									"enum": [
+										"none",
+										"square",
+										"hexRowsOdd",
+										"hexRowsEven",
+										"hexColsOdd",
+										"hexColsEven"
+									]
+								},
+								"size": {"type": "integer"},
+								"offsetX": {"type": "integer"},
+								"offsetY": {"type": "integer"}
+							},
+							"additionalProperties": false
 						},
 						"mapRegions": {
 							"type": "array",
@@ -1030,6 +1062,35 @@
 								"additionalProperties": false
 							}
 						},
+						"mapParent": {
+							"description": "Note that the order of transformations is: scale, then offset.",
+							"type": "object",
+							"properties": {
+								"id": {"type": "string"},
+								"offsetX": {
+									"description": "The X position of this map within the parent map. Defaults to 0.",
+									"type": "integer"
+								},
+								"offsetY": {
+									"description": "The Y position of this map within the parent map. Defaults to 0.",
+									"type": "integer"
+								},
+								"scaleX": {
+									"description": "X scaling required for this map to match the parent map. Defaults to 1.",
+									"type": "number", "exclusiveMinimum": 0
+								},
+								"scaleY": {
+									"description": "Y scaling required for this map to match the parent map. Defaults to 1.",
+									"type": "number", "exclusiveMinimum": 0
+								},
+								"autoScale": {
+									"description": "If the X/Y scaling for this map should be based on the size ratio between the two. This is often used a placeholder for maps requiring future manual adjustment.",
+									"type": "boolean"
+								}
+							},
+							"additionalProperties": false
+						},
+						"mapName": {"type": "string"},
 						"width": {
 							"type": "integer"
 						},
@@ -1201,7 +1262,7 @@
 			"properties": {
 				"type": {"const": "dataCreature"},
 				"dataCreature": {
-					"$ref" : "bestiary.json#/definitions/creature"
+					"$ref" : "bestiary/bestiary.json#/definitions/creature"
 				}
 			},
 			"required": [
@@ -1214,7 +1275,7 @@
 			"properties": {
 				"type": {"const": "dataSpell"},
 				"dataSpell": {
-					"$ref" : "spells.json#/definitions/spell"
+					"$ref" : "spells/spells.json#/definitions/spell"
 				}
 			},
 			"required": [
@@ -1355,6 +1416,9 @@
 						"yearly": {
 							"$ref": "#/definitions/entrySpellcasting_frequency"
 						},
+						"charges": {
+							"$ref": "#/definitions/entrySpellcasting_frequency"
+						},
 						"spells": {
 							"type": "object",
 							"properties": {
@@ -1435,6 +1499,10 @@
 							"description": "Implicitly \"trait\"",
 							"type": "string",
 							"enum": ["trait", "action"]
+						},
+						"chargesItem": {
+							"type": "string",
+							"description": "The UID of an item which provides the charges required to cast any \"charges\" spells."
 						}
 					},
 					"required": [

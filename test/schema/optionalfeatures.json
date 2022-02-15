@@ -1,13 +1,10 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "optionalfeatures.json",
-	"version": "1.10.1",
+	"version": "1.11.0",
 	"title": "Optional Features",
 	"type": "object",
 	"definitions": {
-		"prerequisite": {
-			"$ref": "util.json#/definitions/prerequisite"
-		},
 		"featureType": {
 			"type": "array",
 			"items": {
@@ -22,7 +19,7 @@
 					"type": "string"
 				},
 				"prerequisite": {
-					"$ref": "#/definitions/prerequisite"
+					"$ref": "util.json#/definitions/prerequisite"
 				},
 				"entries": {
 					"type": "array",
@@ -95,8 +92,8 @@
 				"skillToolLanguageProficiencies": {
 					"$ref": "util.json#/definitions/skillToolLanguageProficiencies"
 				},
-				"proficiencyTags": {
-					"$ref": "util.json#/definitions/proficiencyTags"
+				"consumes": {
+					"$ref": "util.json#/definitions/consumesObject"
 				}
 			},
 			"required": [
