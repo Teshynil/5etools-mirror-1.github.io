@@ -1,7 +1,10 @@
 const fs = require("fs");
-require("../js/utils");
 const ut = require("../node/util.js");
 const Ajv = require("ajv").default;
+const jsonSourceMap = require("json-source-map");
+
+const _IS_SORT_RESULTS = !process.env.VET_TEST_JSON_RESULTS_UNSORTED;
+const _IS_TRIM_RESULTS = !process.env.VET_TEST_JSON_RESULTS_UNTRIMMED;
 
 // Compile the schema
 require("../node/compile-schemas.js");
@@ -25,11 +28,36 @@ ajv.addFormat(
 );
 // endregion
 
-function handleError () {
-	const out = JSON.stringify(ajv.errors, null, 2);
+function handleError (data) {
+	const outRaw = JSON.stringify(ajv.errors, null, 2);
+
+	// Sort the deepest errors to the bottom, as these are the ones we're most likely to be the ones we care about
+	//   manually checking.
+	if (_IS_SORT_RESULTS) {
+		ajv.errors.sort((a, b) => (a.instancePath.length ?? -1) - (b.instancePath.length ?? -1));
+	}
+
+	// If there are an excessive number of errors, it's probably a junk entry; show only the first error and let the
+	//   user figure it out.
+	if (_IS_TRIM_RESULTS && ajv.errors.length > 5) {
+		console.error(`(${ajv.errors.length} errors found, showing (hopefully) most-relevant one\u2014see the "log-test-json.json" file for the rest.)`);
+		ajv.errors = ajv.errors.slice(-1);
+	}
+
+	// Add line numbers
+	const sourceMap = jsonSourceMap.stringify(data, null, "\t");
+	ajv.errors.forEach(it => {
+		const errorPointer = sourceMap.pointers[it.instancePath];
+		it.lineNumberStart = errorPointer.value.line;
+		it.lineNumberEnd = errorPointer.valueEnd.line;
+	});
+
+	const out = ajv.errors.map(it => JSON.stringify(it, null, 2)).join("\n");
 	console.error(out);
 	console.warn(`Tests failed`);
-	fs.writeFileSync("../log-test-json.json", out, "utf-8");
+
+	fs.writeFileSync("../log-test-json.json", outRaw, "utf-8");
+
 	return false;
 }
 
@@ -97,7 +125,7 @@ async function main () {
 
 			addImplicits(data);
 			const valid = ajv.validate(schemaFile, data);
-			if (!valid) return handleError(valid);
+			if (!valid) return handleError(data);
 		}
 	}
 
@@ -128,7 +156,7 @@ async function main () {
 
 				addImplicits(data);
 				const valid = ajv.validate(schemaKey, data);
-				if (!valid) return handleError(valid);
+				if (!valid) return handleError(data);
 			}
 		}
 	}
